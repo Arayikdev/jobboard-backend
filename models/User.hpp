@@ -72,26 +72,43 @@ private:
     std::chrono::system_clock::time_point updated_at;
 
 public:
-    User(const json &j)
+    User(std::string e, std::string p)
     {
-        if (!validate_user_json(j))
-            throw std::runtime_error("missing argument");
-
-        programming_languages = j["programming_languages"].get<std::vector<std::string>>();
-        skills = j["skills"].get<std::vector<std::string>>();
-        category = j["category"].get<std::vector<std::string>>();
-        grade = string_to_grade(j["grade"].get<std::string>());
-        name = j["name"].get<std::string>();
-        email = j["email"].get<std::string>();
-        password = j["password"].get<std::string>();
-        location = j["location"].get<std::string>();
-        bio = j["bio"].get<std::string>();
-        lastname = j["lastname"].get<std::string>();
-        isPublic = j["isPublic"].get<bool>();
-        avatarBase64 = j["avatarBase64"].get<std::string>();
+        email = e;
+        password = p;
+        isPublic = false;
+        name = "";
+        bio = "";
+        location = "";
+        avatarBase64 = "";
         created_at = std::chrono::system_clock::now();
         updated_at = created_at;
+        skills = {};
+        programming_languages = {};
+        grade = Grade::Unknown;
+        category = {};
+        lastname = "";
     }
+    // User(const json &j)
+    // {
+    //     if (!validate_user_json(j))
+    //         throw std::runtime_error("missing argument");
+
+    //     programming_languages = j["programming_languages"].get<std::vector<std::string>>();
+    //     skills = j["skills"].get<std::vector<std::string>>();
+    //     category = j["category"].get<std::vector<std::string>>();
+    //     grade = string_to_grade(j["grade"].get<std::string>());
+    //     name = j["name"].get<std::string>();
+    //     email = j["email"].get<std::string>();
+    //     password = j["password"].get<std::string>();
+    //     location = j["location"].get<std::string>();
+    //     bio = j["bio"].get<std::string>();
+    //     lastname = j["lastname"].get<std::string>();
+    //     isPublic = j["isPublic"].get<bool>();
+    //     avatarBase64 = j["avatarBase64"].get<std::string>();
+    //     created_at = std::chrono::system_clock::now();
+    //     updated_at = created_at;
+    // }
 
     // Convert User to BSON (MongoDB)
     bsoncxx::document::value toBson() const

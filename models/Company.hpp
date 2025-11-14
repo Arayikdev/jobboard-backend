@@ -18,6 +18,7 @@ class Company
 private:
     std::string name;
     std::string email;
+    std::string password;
     std::string website;
     std::string description;
     std::string avatarBase64;
@@ -38,21 +39,32 @@ private:
     }
 
 public:
-    Company(const json &j)
+    Company(std::string e, std::string p)
     {
-        if (!validate_company_json(j))
-        {
-            throw std::runtime_error("Missing required company field");
-        }
-
+        email = e;
+        password = p;
+        name = "",
+        website = "",
+        avatarBase64 = "";
+        description = "";
+        location = "";
         created_at = std::chrono::system_clock::now();
-        name = j["name"].get<std::string>();
-        email = j["email"].get<std::string>();
-        website = j["website"].get<std::string>();
-        description = j["description"].get<std::string>();
-        avatarBase64 = j["avatarBase64"].get<std::string>();
-        location = j["location"].get<std::string>();
     }
+    // Company(const json &j)
+    // {
+    //     if (!validate_company_json(j))
+    //     {
+    //         throw std::runtime_error("Missing required company field");
+    //     }
+    //     password = j["password"].get<std::string>();
+    //     created_at = std::chrono::system_clock::now();
+    //     name = j["name"].get<std::string>();
+    //     email = j["email"].get<std::string>();
+    //     website = j["website"].get<std::string>();
+    //     description = j["description"].get<std::string>();
+    //     avatarBase64 = j["avatarBase64"].get<std::string>();
+    //     location = j["location"].get<std::string>();
+    // }
 
     bsoncxx::document::value toBson() const
     {
