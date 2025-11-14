@@ -46,16 +46,6 @@ std::string grade_to_string(Grade grade)
 class User
 {
 private:
-    bool validate_user_json(const json &j)
-    {
-        static const std::vector<std::string> required_fields = {
-            "name", "email", "password", "programming_languages", "grade", "location", "bio", "isPublic", "lastname", "skills", "category"};
-        for (const auto &field : required_fields)
-            if (!j.contains(field))
-                return false;
-        return true;
-    }
-
     std::string name;
     std::string lastname;
     std::string email;
@@ -89,28 +79,6 @@ public:
         category = {};
         lastname = "";
     }
-    // User(const json &j)
-    // {
-    //     if (!validate_user_json(j))
-    //         throw std::runtime_error("missing argument");
-
-    //     programming_languages = j["programming_languages"].get<std::vector<std::string>>();
-    //     skills = j["skills"].get<std::vector<std::string>>();
-    //     category = j["category"].get<std::vector<std::string>>();
-    //     grade = string_to_grade(j["grade"].get<std::string>());
-    //     name = j["name"].get<std::string>();
-    //     email = j["email"].get<std::string>();
-    //     password = j["password"].get<std::string>();
-    //     location = j["location"].get<std::string>();
-    //     bio = j["bio"].get<std::string>();
-    //     lastname = j["lastname"].get<std::string>();
-    //     isPublic = j["isPublic"].get<bool>();
-    //     avatarBase64 = j["avatarBase64"].get<std::string>();
-    //     created_at = std::chrono::system_clock::now();
-    //     updated_at = created_at;
-    // }
-
-    // Convert User to BSON (MongoDB)
     bsoncxx::document::value toBson() const
     {
         using bsoncxx::builder::basic::array;

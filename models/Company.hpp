@@ -25,19 +25,6 @@ private:
     std::string location;
     std::chrono::system_clock::time_point created_at;
 
-    bool validate_company_json(const json &j)
-    {
-        static const std::vector<std::string> required_fields = {
-            "name", "email", "website", "description", "avatarBase64", "location"};
-
-        for (const auto &field : required_fields)
-        {
-            if (!j.contains(field))
-                return false;
-        }
-        return true;
-    }
-
 public:
     Company(std::string e, std::string p)
     {
@@ -50,21 +37,6 @@ public:
         location = "";
         created_at = std::chrono::system_clock::now();
     }
-    // Company(const json &j)
-    // {
-    //     if (!validate_company_json(j))
-    //     {
-    //         throw std::runtime_error("Missing required company field");
-    //     }
-    //     password = j["password"].get<std::string>();
-    //     created_at = std::chrono::system_clock::now();
-    //     name = j["name"].get<std::string>();
-    //     email = j["email"].get<std::string>();
-    //     website = j["website"].get<std::string>();
-    //     description = j["description"].get<std::string>();
-    //     avatarBase64 = j["avatarBase64"].get<std::string>();
-    //     location = j["location"].get<std::string>();
-    // }
 
     bsoncxx::document::value toBson() const
     {
