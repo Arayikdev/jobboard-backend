@@ -5,13 +5,14 @@
 #include <mongocxx/collection.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/basic/kvp.hpp>
+#include "../utils/Password.hpp"
 
-#include <openssl/sha.h>
-#include <sstream>
-#include <iomanip>
-#include <random>
-#include <string>
-#include <array>
+// #include <openssl/sha.h>
+// #include <sstream>
+// #include <iomanip>
+// #include <random>
+// #include <string>
+// #include <array>
 
 using bsoncxx::builder::basic::kvp;
 using bsoncxx::builder::basic::make_document;

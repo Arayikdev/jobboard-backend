@@ -50,6 +50,7 @@ public:
             kvp("description", description),
             kvp("avatarBase64", avatarBase64),
             kvp("location", location),
+            kvp("password", password),
             kvp("createdAt", bsoncxx::types::b_date(created_at)));
     }
 
@@ -62,6 +63,7 @@ public:
             {"description", description},
             {"avatarBase64", avatarBase64},
             {"location", location},
+            {"password", password},
             {"created_at", std::chrono::duration_cast<std::chrono::milliseconds>(
                                created_at.time_since_epoch())
                                .count()}};

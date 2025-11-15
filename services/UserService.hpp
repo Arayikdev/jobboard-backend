@@ -17,7 +17,7 @@ private:
 public:
     UserService(mongocxx::collection coll) : collection(coll) {}
 
-    std::vector<json> getUsers(const httplib::Request &, httplib::Response &)
+    std::vector<json> getUsers()
     {
         std::vector<json> users;
         for (auto &&doc : collection.find({}))
