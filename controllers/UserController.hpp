@@ -6,7 +6,7 @@ using json = nlohmann::json;
 class UserController
 {
 private:
-    UserService &service; // ссылка на сервис
+    UserService &service; // reference to service
 
 public:
     UserController(UserService &srv) : service(srv) {}
