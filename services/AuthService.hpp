@@ -47,6 +47,7 @@ public:
             json cleanUser = sanitize(view);
 
             return {
+                {"role" , "user"},
                 {"token", token},
                 {"user", cleanUser}};
         }
@@ -66,6 +67,7 @@ public:
             json cleanCompany = sanitize(view);
 
             return {
+                {"role" , "company"},
                 {"token", token},
                 {"company", cleanCompany}};
         }

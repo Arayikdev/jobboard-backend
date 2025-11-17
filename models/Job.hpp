@@ -29,47 +29,65 @@ private:
     } salaryRange;
     std::string location;
     std::vector<std::string> workType;
-    std::string status;               
+    std::string status;
+
     std::chrono::system_clock::time_point createdAt;
     std::chrono::system_clock::time_point updatedAt;
 
-    bool validate_job_json(const json &j)
+    static void validate(const json &j)
     {
-        static const std::vector<std::string> required_fields = {
-            "companyId", "title", "description", "requiredLanguages",
-            "grade", "skills", "category", "salaryRange",
-            "location", "workType", "status"};
-
-        for (const auto &field : required_fields)
+        auto require_string = [&](const std::string &key)
         {
-            if (!j.contains(field))
-                return false;
-        }
+            if (!j.contains(key) || !j[key].is_string())
+                throw std::runtime_error("Missing or invalid field: " + key);
+        };
 
-        if (!j["salaryRange"].contains("min") || !j["salaryRange"].contains("max"))
-            return false;
+        auto require_array = [&](const std::string &key)
+        {
+            if (!j.contains(key) || !j[key].is_array())
+                throw std::runtime_error("Missing or invalid array: " + key);
+        };
 
-        return true;
+        require_string("title");
+        require_string("description");
+        require_array("requiredLanguages");
+        require_string("grade");
+        require_array("skills");
+        require_array("category");
+        require_string("location");
+        require_array("workType");
+        require_string("status");
+
+        // salaryRange fields
+        if (!j.contains("salaryRange") || !j["salaryRange"].is_object())
+            throw std::runtime_error("Missing salaryRange");
+
+        if (!j["salaryRange"].contains("min") || !j["salaryRange"]["min"].is_number())
+            throw std::runtime_error("salaryRange.min is missing or invalid");
+
+        if (!j["salaryRange"].contains("max") || !j["salaryRange"]["max"].is_number())
+            throw std::runtime_error("salaryRange.max is missing or invalid");
     }
 
 public:
-    Job(const json &j)
+    Job(const std::string &companyId_, const json &j)
     {
-        if (!validate_job_json(j))
-            throw std::runtime_error("Missing required job field(s)");
+        validate(j);
 
-        companyId = j["companyId"].get<std::string>();
+        companyId = companyId_;
         title = j["title"].get<std::string>();
         description = j["description"].get<std::string>();
         requiredLanguages = j["requiredLanguages"].get<std::vector<std::string>>();
         grade = j["grade"].get<std::string>();
         skills = j["skills"].get<std::vector<std::string>>();
         category = j["category"].get<std::vector<std::string>>();
+
         salaryRange.min = j["salaryRange"]["min"].get<double>();
         salaryRange.max = j["salaryRange"]["max"].get<double>();
+
         location = j["location"].get<std::string>();
         workType = j["workType"].get<std::vector<std::string>>();
-        status = j["status"].get<std::string>();
+        status = "pending";
 
         createdAt = std::chrono::system_clock::now();
         updatedAt = createdAt;
@@ -140,3 +158,21 @@ public:
 };
 
 #endif
+
+
+
+// {
+//   "title": "C++ Backend Developer",
+//   "description": "Work on high-performance systems.",
+//   "requiredLanguages": ["C++", "Python"],
+//   "grade": "Junior",
+//   "skills": ["STL", "OOP", "Linux"],
+//   "category": ["Backend"],
+//   "salaryRange": {
+//     "min": 100000,
+//     "max": 200000
+//   },
+//   "location": "Remote",
+//   "workType": ["Remote"],
+//   "status": "open"
+// }

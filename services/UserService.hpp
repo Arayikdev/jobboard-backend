@@ -31,7 +31,6 @@ public:
 
     json getOne(const bsoncxx::oid &user_oid)
     {
-        std::cout << "one" << std::endl;
         auto maybe_user = collection.find_one(
             bsoncxx::builder::stream::document{}
             << "_id" << user_oid

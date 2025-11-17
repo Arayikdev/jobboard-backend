@@ -32,10 +32,12 @@ public:
         }
     }
 
-    void getJobByObjectId(const bsoncxx::oid &jobId, httplib::Response &res)
+    void getJobByObjectId(const httplib::Request &req, httplib::Response &res)
     {
         try
         {
+            std::string idStr = req.matches[1].str();
+            bsoncxx::oid jobId(idStr);
             auto job = service.getOne(jobId);
 
             if (job.is_null())
@@ -56,7 +58,9 @@ public:
         }
     }
 
-    void createJob(const std::string &ownerId, const httplib::Request &req, httplib::Response &res)
+    void createJob(const httplib::Request &req,
+                   httplib::Response &res,
+                   const std::string &companyId)
     {
         json body;
 
@@ -64,36 +68,28 @@ public:
         {
             body = json::parse(req.body);
         }
-        catch (const json::parse_error &e)
+        catch (...)
         {
             res.status = 400;
             res.set_content("Invalid JSON", "text/plain");
             return;
         }
 
-        try
-        {
-            json created = service.createJob(ownerId, body);
+        auto result = service.createJob(companyId, body);
 
-            if (created.empty())
-            {
-                res.status = 400;
-                res.set_content("Failed to create job", "text/plain");
-            }
-            else
-            {
-                res.status = 201;
-                res.set_content(created.dump(), "application/json");
-            }
-        }
-        catch (const std::exception &e)
+        if (result.contains("error"))
         {
             res.status = 400;
-            res.set_content("Wrong Data", "text/plain");
+            res.set_content(result.dump(), "application/json");
+        }
+        else
+        {
+            res.status = 201;
+            res.set_content(result.dump(), "application/json");
         }
     }
 
-    void updateJob(std::string id, const httplib::Request &req, httplib::Response &res)
+    void updateJob(const httplib::Request &req, httplib::Response &res, std::string companyId)
     {
         json body;
 
@@ -110,8 +106,9 @@ public:
 
         try
         {
-            bool updated = service.updateJob(id, body);
-
+            std::string jobIdStr = req.matches[1].str();
+            bsoncxx::oid jobId(jobIdStr);
+            bool updated = service.updateJob(jobId, companyId, body);
             if (updated)
             {
                 res.status = 200;
@@ -130,27 +127,23 @@ public:
         }
     }
 
-    void deleteJob(std::string id, httplib::Response &res)
+    void deleteJob(const std::string &companyId,
+                   const httplib::Request &req,
+                   httplib::Response &res)
     {
         try
         {
-            bool removed = service.deleteJob(id);
+            std::string jobIdStr = req.matches[1].str();
+            bsoncxx::oid jobId(jobIdStr);
 
-            if (removed)
-            {
-                res.status = 200;
-                res.set_content("Job deleted successfully", "text/plain");
-            }
-            else
-            {
-                res.status = 404;
-                res.set_content("Job not found", "text/plain");
-            }
+            auto result = service.deleteJob(jobId, companyId);
+
+            res.set_content(result.dump(), "application/json");
         }
-        catch (const std::exception &e)
+        catch (...)
         {
             res.status = 400;
-            res.set_content("Wrong Data", "text/plain");
+            res.set_content("{\"error\": \"Invalid ID\"}", "application/json");
         }
     }
 };

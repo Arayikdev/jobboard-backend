@@ -1,5 +1,6 @@
 #include "routes/UserRoutes.hpp"
 #include "routes/AuthRoutes.hpp"
+#include "routes/JobRoutes.hpp"
 #include "models/Company.hpp"
 #include <mongocxx/instance.hpp> // required
 #include <mongocxx/client.hpp>
@@ -16,6 +17,7 @@ int main()
     auto usersCollection = db["users"];
     auto emailCollection = db["email"];
     auto companyCollection = db["company"];
+    auto jobCollection = db["jobs"];
 
     UserService userService(usersCollection);
     UserController userController(userService);
@@ -29,11 +31,16 @@ int main()
     AuthService authservice(companyCollection, usersCollection);
     AuthController authcontroller(authservice);
 
+    JobService jobservice(jobCollection);
+    JobController jobcontroller(jobservice);
+
     httplib::Server server;
     registerUserRoutes(server, userController);
     registerUserAuthRoutes(server, userauthcontroller);
     registerCompanyAuthRoutes(server, companyauthcontroller);
     login(server, authcontroller);
+    registerJobRoutes(server, jobcontroller);
+
 
     server.Options(".*", [&](const httplib::Request &req, httplib::Response &res)
                    {

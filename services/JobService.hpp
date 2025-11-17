@@ -1,18 +1,23 @@
 #pragma once
 
+#include "../models/Job.hpp"
 #include "../third_party/httplib.h"
 #include "../third_party/json.hpp"
 #include <vector>
 #include <bsoncxx/types.hpp>
 #include <chrono>
 #include <bsoncxx/oid.hpp>
+
 #include <bsoncxx/builder/basic/document.hpp>
+#include <bsoncxx/builder/basic/kvp.hpp>
+#include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/builder/basic/sub_array.hpp>
+
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
 #include <mongocxx/collection.hpp>
 
 using json = nlohmann::json;
-using namespace bsoncxx::builder::basic;
 
 class JobService
 {
@@ -22,29 +27,145 @@ private:
 public:
     JobService(mongocxx::collection coll) : collection(coll) {}
 
-    std::vector<json> getJobs(const httplib::Request &, httplib::Response &)
+    // ---------------- GET ALL APPROVED JOBS ----------------
+    std::vector<json> getJobs(const httplib::Request &req, httplib::Response &)
+{
+    using bsoncxx::builder::basic::array;
+    using bsoncxx::builder::basic::kvp;
+    using bsoncxx::builder::basic::make_document;
+
+    bsoncxx::builder::basic::document filter{};
+
+    // Только approved
+    filter.append(kvp("status", "approved"));
+
+    // 1) category (строка)
+    if (req.has_param("category"))
     {
-        std::vector<json> jobs;
-
-        for (auto &&doc : collection.find({}))
+        std::string cat = req.get_param_value("category");
+        if (!cat.empty())
         {
-            auto tmp = json::parse(bsoncxx::to_json(doc));
-
-            if (tmp.value("status", "pending") == "approved")
-                jobs.push_back(tmp);
+            filter.append(kvp("category", cat));
         }
-
-        return jobs;
     }
 
+    // 2) language -> requiredLanguages (массив строк)
+    // Mongo умеет искать значение в массиве просто по равенству:
+    // { requiredLanguages: "C++" } матчится на ["C++", "Python"]
+    if (req.has_param("language"))
+    {
+        std::string lang = req.get_param_value("language");
+        if (!lang.empty())
+        {
+            filter.append(kvp("requiredLanguages", lang));
+        }
+    }
+
+    // 3) skills = "Docker,Algorithms"
+    // Требуем, чтобы ВСЕ указанные skills были в массиве skills
+    if (req.has_param("skills"))
+    {
+        std::string skillsStr = req.get_param_value("skills");
+        std::stringstream ss(skillsStr);
+        std::string skill;
+
+        array skills_arr;
+
+        while (std::getline(ss, skill, ','))
+        {
+            // немного подчистим пробелы вокруг
+            auto start = skill.find_first_not_of(" \t\r\n");
+            auto end   = skill.find_last_not_of(" \t\r\n");
+            if (start == std::string::npos)
+                continue;
+            skill = skill.substr(start, end - start + 1);
+
+            if (!skill.empty())
+            {
+                skills_arr.append(skill);
+            }
+        }
+
+        if (!skills_arr.view().empty())
+        {
+            filter.append(
+                kvp("skills",
+                    make_document(kvp("$all", skills_arr))));
+        }
+    }
+
+    // 4) location
+    if (req.has_param("location"))
+    {
+        std::string loc = req.get_param_value("location");
+        if (!loc.empty())
+        {
+            filter.append(kvp("location", loc));
+        }
+    }
+
+    // 5) grade
+    if (req.has_param("grade"))
+    {
+        std::string level = req.get_param_value("grade");
+        if (!level.empty())
+        {
+            filter.append(kvp("grade", level));
+        }
+    }
+
+    // 6) salary = "min,max" c пересечением диапазонов
+    if (req.has_param("salary"))
+    {
+        std::string salaryStr = req.get_param_value("salary");
+        std::stringstream ss(salaryStr);
+        std::string minStr, maxStr;
+
+        if (std::getline(ss, minStr, ',') && std::getline(ss, maxStr, ','))
+        {
+            try
+            {
+                double qMin = std::stod(minStr);
+                double qMax = std::stod(maxStr);
+
+                // vacancy.min <= queryMax
+                filter.append(
+                    kvp("salaryRange.min",
+                        make_document(kvp("$lte", qMax))));
+
+                // vacancy.max >= queryMin
+                filter.append(
+                    kvp("salaryRange.max",
+                        make_document(kvp("$gte", qMin))));
+            }
+            catch (...)
+            {
+                // некорректная зарплата -> просто не добавляем фильтр
+            }
+        }
+    }
+
+    // ---- выполняем запрос ----
+    std::vector<json> jobs;
+    auto cursor = collection.find(filter.view());
+
+    for (auto &&doc : cursor)
+    {
+        jobs.push_back(json::parse(bsoncxx::to_json(doc)));
+    }
+
+    return jobs;
+}
+
+
+    // ---------------- GET ONE JOB ----------------
     json getOne(const bsoncxx::oid &job_oid)
     {
         auto maybe_job = collection.find_one(
             bsoncxx::builder::stream::document{}
             << "_id" << job_oid
             << "status" << "approved"
-            << bsoncxx::builder::stream::finalize
-        );
+            << bsoncxx::builder::stream::finalize);
 
         if (!maybe_job)
             return json::object();
@@ -52,47 +173,74 @@ public:
         return json::parse(bsoncxx::to_json(maybe_job->view()));
     }
 
-    bool updateJob(const std::string &id, const json &body)
+    // ---------------- UPDATE JOB ----------------
+    json updateJob(const bsoncxx::oid &jobId,
+                   const std::string &companyId,
+                   const json &body)
     {
-        bsoncxx::oid job_oid;
+        using bsoncxx::builder::basic::kvp;
+        using bsoncxx::builder::basic::make_document;
 
-        try
+        // 1. Найти job в базе
+        auto jobOpt = collection.find_one(
+            make_document(kvp("_id", jobId)));
+
+        if (!jobOpt)
         {
-            job_oid = bsoncxx::oid{id};
-        }
-        catch (const std::exception &)
-        {
-            return false;
+            return {{"error", "Job not found"}};
         }
 
-        document set_doc{};
+        json jobJson = json::parse(bsoncxx::to_json(*jobOpt));
+
+        // 2. Проверить принадлежность компании
+        if (jobJson["companyId"].get<std::string>() != companyId)
+        {
+            return {
+                {"error", "Forbidden: cannot update job of another company"},
+                {"status", 403}};
+        }
+
+        // 3. Собрать $set документ
+        bsoncxx::builder::basic::document set_doc{};
 
         for (auto it = body.begin(); it != body.end(); ++it)
         {
-            const std::string &k = it.key();
+            const std::string &key = it.key();
 
-            if (k != "_id" && k != "createdAt")
-                append_json_value(set_doc, k, it.value());
+            if (key != "_id" && key != "createdAt" && key != "companyId")
+            {
+                append_json_value(set_doc, key, it.value());
+            }
         }
 
-        set_doc.append(kvp(
-            "updatedAt",
-            bsoncxx::types::b_date{std::chrono::system_clock::now()}
-        ));
+        // 4. Обновить updatedAt
+        set_doc.append(kvp("updatedAt", bsoncxx::types::b_date{
+                                            std::chrono::system_clock::now()}));
 
-        document update_doc{};
+        bsoncxx::builder::basic::document update_doc{};
         update_doc.append(kvp("$set", set_doc.extract()));
 
-        auto filter = make_document(kvp("_id", job_oid));
-        auto result = collection.update_one(filter.view(), update_doc.view());
+        auto result = collection.update_one(
+            make_document(kvp("_id", jobId)),
+            update_doc.view());
 
-        return result && result->modified_count() > 0;
+        if (!result || result->modified_count() == 0)
+        {
+            return {{"error", "Update failed"}};
+        }
+
+        return {{"message", "Job updated"}};
     }
 
-    static void append_json_value(document &doc,
-                                  const std::string &key,
-                                  const json &value)
+    // ----------- JSON → BSON helper -------------
+    static void append_json_value(
+        bsoncxx::builder::basic::document &doc,
+        const std::string &key,
+        const json &value)
     {
+        using bsoncxx::builder::basic::kvp;
+        using bsoncxx::builder::basic::sub_array;
+
         if (value.is_null())
         {
             doc.append(kvp(key, bsoncxx::types::b_null{}));
@@ -119,26 +267,27 @@ public:
         }
         else if (value.is_array())
         {
-            doc.append(kvp(key, [&](sub_array sub)
-            {
-                for (const auto &el : value)
-                {
-                    if (el.is_null())
-                        sub.append(bsoncxx::types::b_null{});
-                    else if (el.is_boolean())
-                        sub.append(el.get<bool>());
-                    else if (el.is_number_integer())
-                        sub.append(static_cast<int64_t>(el.get<int64_t>()));
-                    else if (el.is_number_unsigned())
-                        sub.append(static_cast<int64_t>(el.get<uint64_t>()));
-                    else if (el.is_number_float())
-                        sub.append(el.get<double>());
-                    else if (el.is_string())
-                        sub.append(el.get<std::string>());
-                    else
-                        sub.append(el.dump());
-                }
-            }));
+            doc.append(kvp(key,
+                           [&](sub_array sub)
+                           {
+                               for (const auto &el : value)
+                               {
+                                   if (el.is_null())
+                                       sub.append(bsoncxx::types::b_null{});
+                                   else if (el.is_boolean())
+                                       sub.append(el.get<bool>());
+                                   else if (el.is_number_integer())
+                                       sub.append(static_cast<int64_t>(el.get<int64_t>()));
+                                   else if (el.is_number_unsigned())
+                                       sub.append(static_cast<int64_t>(el.get<uint64_t>()));
+                                   else if (el.is_number_float())
+                                       sub.append(el.get<double>());
+                                   else if (el.is_string())
+                                       sub.append(el.get<std::string>());
+                                   else
+                                       sub.append(el.dump());
+                               }
+                           }));
         }
         else
         {
@@ -146,49 +295,59 @@ public:
         }
     }
 
-    json createJob(const std::string &ownerId, const json &body)
+    // ---------------- CREATE JOB ----------------
+    json createJob(const std::string &companyId, const json &body)
     {
-        document doc{};
-
-        for (auto it = body.begin(); it != body.end(); ++it)
-        {
-            const std::string &key = it.key();
-            if (key != "_id" && key != "createdAt" && key != "updatedAt")
-                append_json_value(doc, key, it.value());
-        }
-
-        doc.append(kvp("ownerId", ownerId));
-        doc.append(kvp("status", "pending"));
-        doc.append(kvp("createdAt", bsoncxx::types::b_date{
-                                   std::chrono::system_clock::now()}));
-        doc.append(kvp("updatedAt", bsoncxx::types::b_date{
-                                   std::chrono::system_clock::now()}));
-
-        bsoncxx::document::value full_doc = doc.extract();
-        auto result = collection.insert_one(full_doc.view());
-
-        if (!result)
-            return json::object();
-
-        return json::parse(bsoncxx::to_json(full_doc.view()));
-    }
-
-    bool deleteJob(const std::string &id)
-    {
-        bsoncxx::oid job_oid;
         try
         {
-            job_oid = bsoncxx::oid{id};
+            Job job(companyId, body);
+            auto result = collection.insert_one(job.toBson().view());
+
+            if (!result)
+                return {{"error", "Failed to create job"}};
+
+            return {
+                {"_id", result->inserted_id().get_oid().value.to_string()},
+                {"message", "Job created"}};
         }
-        catch (const std::exception &)
+        catch (const std::exception &e)
         {
-            return false; 
+            return {{"error", e.what()}};
         }
-
-        auto filter = make_document(kvp("_id", job_oid));
-        auto result = collection.delete_one(filter.view());
-
-        return result && result->deleted_count() > 0;
     }
 
+    // ---------------- DELETE JOB ----------------
+    json deleteJob(const bsoncxx::oid &jobId,
+                   const std::string &companyId)
+    {
+        // 1. find job
+        auto job = collection.find_one(
+            make_document(
+                kvp("_id", jobId)));
+
+        if (!job)
+        {
+            return {{"error", "Job not found"}};
+        }
+
+        json j = json::parse(bsoncxx::to_json(*job));
+
+        // 2. check ownership
+        if (j["companyId"].get<std::string>() != companyId)
+        {
+            return {{"error", "Forbidden: not your job"}, {"status", 403}};
+        }
+
+        // 3. delete
+        auto result = collection.delete_one(
+            make_document(
+                kvp("_id", jobId)));
+
+        if (!result || result->deleted_count() == 0)
+        {
+            return {{"error", "Delete failed"}};
+        }
+
+        return {{"message", "Job deleted"}};
+    }
 };
