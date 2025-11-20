@@ -1,18 +1,44 @@
+#pragma once
 #include "../controllers/UserController.hpp"
+#include "../middleware/AuthMiddleware.hpp"
+
 void registerUserRoutes(httplib::Server &server, UserController &usercontroller)
 {
-  server.Get("/users", [&](const httplib::Request &req, httplib::Response &res)
-             {
-              res.set_header("Access-Control-Allow-Origin", "*"); 
-              usercontroller.getUsers(req, res); });
+    // GET /users
+    server.Get("/users", [&](const httplib::Request &req, httplib::Response &res)
+    {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        usercontroller.getUsers(req, res);
+    });
 
-  server.Get(R"(/users/([a-fA-F0-9]{24}))", [&](const httplib::Request &req, httplib::Response &res)
-             {
-      res.set_header("Access-Control-Allow-Origin", "*");    // Converting sub_match to std::string 
-    usercontroller.getMe(req, res); });
+    // GET /users/:id
+    server.Get(R"(/users/([a-fA-F0-9]{24}))",
+    [&](const httplib::Request &req, httplib::Response &res)
+    {
+        res.set_header("Access-Control-Allow-Origin", "*");
 
-  server.Put(R"(/users/([a-fA-F0-9]{24}))", [&](const httplib::Request &req, httplib::Response &res)
-             {
-              res.set_header("Access-Control-Allow-Origin", "*");
-    usercontroller.updateProfile(req, res); });
+        std::string tokenUserId;
+        bool loggedIn = AuthMiddleware::verifyUser(req, res, tokenUserId);
+
+        usercontroller.getUserById(req, res, tokenUserId, loggedIn);
+    });
+
+    // PUT /users/:id
+    server.Put(R"(/users/([a-fA-F0-9]{24}))",
+    [&](const httplib::Request &req, httplib::Response &res)
+    {
+      std::cout << "a" << std::endl;
+        res.set_header("Access-Control-Allow-Origin", "*");
+
+        std::string tokenUserId;
+        bool loggedIn = AuthMiddleware::verifyUser(req, res, tokenUserId);
+
+        if (!loggedIn) {
+            res.status = 401;
+            res.set_content("Unauthorized", "text/plain");
+            return;
+        }
+      std::cout << "vefpre contrroller" << std::endl;
+        usercontroller.updateProfile(req, res, tokenUserId);
+    });
 }

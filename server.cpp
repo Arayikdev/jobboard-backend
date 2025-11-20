@@ -1,3 +1,4 @@
+#include "routes/CompanyRoutes.hpp"
 #include "routes/UserRoutes.hpp"
 #include "routes/AuthRoutes.hpp"
 #include "routes/JobRoutes.hpp"
@@ -19,6 +20,13 @@ int main()
     auto companyCollection = db["company"];
     auto jobCollection = db["jobs"];
 
+    httplib::Server server;
+    server.Options(".*", [&](const httplib::Request &req, httplib::Response &res)
+                   {
+        res.set_header("Access-Control-Allow-Origin", "*");
+        res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        res.set_header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        res.status = 200; });
     UserService userService(usersCollection);
     UserController userController(userService);
 
@@ -34,20 +42,18 @@ int main()
     JobService jobservice(jobCollection);
     JobController jobcontroller(jobservice);
 
-    httplib::Server server;
+    CompanyService companyservice(companyCollection);
+    CompanyController companycontroller(companyservice);
+
     registerUserRoutes(server, userController);
     registerUserAuthRoutes(server, userauthcontroller);
     registerCompanyAuthRoutes(server, companyauthcontroller);
     login(server, authcontroller);
     registerJobRoutes(server, jobcontroller);
+    registerCompanyRoutes(server, companycontroller);
+    
 
 
-    server.Options(".*", [&](const httplib::Request &req, httplib::Response &res)
-                   {
-        res.set_header("Access-Control-Allow-Origin", "*");
-        res.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-        res.set_header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-        res.status = 200; });
 
 
     

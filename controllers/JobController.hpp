@@ -70,15 +70,18 @@ public:
         }
         catch (...)
         {
+            std::cout << " in catch" << std::endl;
             res.status = 400;
             res.set_content("Invalid JSON", "text/plain");
             return;
         }
-
+        std::cout << "before service" << std::endl;
         auto result = service.createJob(companyId, body);
+        std::cout << "after service" << std::endl;
 
         if (result.contains("error"))
         {
+            std::cout << "in if" << std::endl;
             res.status = 400;
             res.set_content(result.dump(), "application/json");
         }
@@ -97,7 +100,7 @@ public:
         {
             body = json::parse(req.body);
         }
-        catch (const json::parse_error &e)
+        catch (...)
         {
             res.status = 400;
             res.set_content("Invalid JSON", "text/plain");
@@ -108,19 +111,22 @@ public:
         {
             std::string jobIdStr = req.matches[1].str();
             bsoncxx::oid jobId(jobIdStr);
-            bool updated = service.updateJob(jobId, companyId, body);
-            if (updated)
+
+            json result = service.updateJob(jobId, companyId, body);
+
+            // ---------- ERROR CASES ----------
+            if (result.contains("error"))
             {
-                res.status = 200;
-                res.set_content("Job updated successfully", "text/plain");
+                res.status = result.value("status", 400);
+                res.set_content(result.dump(), "application/json");
+                return;
             }
-            else
-            {
-                res.status = 404;
-                res.set_content("Job not found", "text/plain");
-            }
+
+            // ---------- SUCCESS ----------
+            res.status = 200;
+            res.set_content(result.dump(), "application/json");
         }
-        catch (const std::exception &e)
+        catch (...)
         {
             res.status = 400;
             res.set_content("Wrong Data", "text/plain");

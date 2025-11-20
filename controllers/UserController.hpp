@@ -1,8 +1,9 @@
+#pragma once
 #include <vector>
-#include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/json.hpp>
 #include "../services/UserService.hpp"
-#include "../utils/jwt.hpp"
+#include "../third_party/httplib.h"
+
 using json = nlohmann::json;
 
 class UserController
@@ -13,81 +14,88 @@ private:
 public:
     UserController(UserService &srv) : service(srv) {}
 
+    // GET /users
     void getUsers(const httplib::Request &req, httplib::Response &res)
     {
-        try
-        {
+        try {
             auto users = service.getUsers();
             res.status = 200;
             res.set_content(json(users).dump(), "application/json");
         }
-        catch (...)
-        {
+        catch (...) {
             res.status = 500;
             res.set_content("Server error", "text/plain");
         }
     }
 
-    void getMe(const httplib::Request &req, httplib::Response &res)
+    // GET /users/:id
+    void getUserById(const httplib::Request &req,
+                     httplib::Response &res,
+                     const std::string &tokenUserId,
+                     bool loggedIn)
     {
-        try
-        {
-            std::string userId = req.get_header_value("userId"); // <<<<<< from middleware
+        std::string pathId = req.matches[1].str();
 
-            auto user = service.getOne(bsoncxx::oid(userId));
+        // 1. Owner → return full profile
+        if (loggedIn && tokenUserId == pathId) {
+            auto fullUser = service.getOnePrivate(bsoncxx::oid(pathId));
 
-            if (user.is_null())
-            {
+            if (fullUser.is_null()) {
                 res.status = 404;
                 res.set_content("User not found", "text/plain");
                 return;
             }
 
             res.status = 200;
-            res.set_content(user.dump(), "application/json");
+            res.set_content(fullUser.dump(), "application/json");
+            return;
         }
-        catch (...)
-        {
-            res.status = 500;
-            res.set_content("Error", "text/plain");
+
+        // 2. Public profile
+        auto publicUser = service.getOnePublic(bsoncxx::oid(pathId));
+
+        if (publicUser.is_null()) {
+            res.status = 404;
+            res.set_content("User not found or private", "text/plain");
+            return;
         }
+
+        res.status = 200;
+        res.set_content(publicUser.dump(), "application/json");
     }
 
-    void updateProfile(const httplib::Request &req, httplib::Response &res)
+    // PUT /users/:id
+    void updateProfile(const httplib::Request &req,
+                       httplib::Response &res,
+                       const std::string &tokenUserId)
     {
+        std::string pathId = req.matches[1].str();
+
+        if (tokenUserId != pathId) {
+            res.status = 403;
+            res.set_content("Cannot update another user's profile", "text/plain");
+            return;
+        }
+
         json body;
-        try
-        {
+        try {
             body = json::parse(req.body);
         }
-        catch (...)
-        {
+        catch (...) {
             res.status = 400;
             res.set_content("Invalid JSON", "text/plain");
             return;
         }
 
-        try
-        {
-            std::string userId = req.get_header_value("userId"); // <<<<<< from middleware
+        bool ok = service.updateProfile(pathId, body);
 
-            bool ok = service.updateProfile(userId, body);
+        if (!ok) {
+            res.status = 404;
+            res.set_content("User not found", "text/plain");
+            return;
+        }
 
-            if (ok)
-            {
-                res.status = 200;
-                res.set_content("Updated successfully", "text/plain");
-            }
-            else
-            {
-                res.status = 404;
-                res.set_content("User not found", "text/plain");
-            }
-        }
-        catch (...)
-        {
-            res.status = 500;
-            res.set_content("Error", "text/plain");
-        }
+        res.status = 200;
+        res.set_content("Updated successfully", "text/plain");
     }
 };

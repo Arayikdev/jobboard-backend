@@ -66,7 +66,7 @@ public:
     {
         email = e;
         password = p;
-        isPublic = false;
+        isPublic = true;
         name = "";
         bio = "";
         location = "";
