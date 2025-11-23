@@ -19,6 +19,7 @@ public:
     // ---------------------------------------------------------
     // POST /applications — apply to job
     // ---------------------------------------------------------
+    
     void createApplication(const httplib::Request &req,
                            httplib::Response &res,
                            const std::string &userId)
