@@ -76,6 +76,8 @@ public:
             return true;
         }
         catch (...) {
+            res.status = 401;
+            res.set_content("Invalid or expired token", "text/plain");
             return false;
         }
     }

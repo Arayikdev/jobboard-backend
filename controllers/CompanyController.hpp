@@ -18,7 +18,7 @@ public:
     void getAllJobs(const bsoncxx::oid &companyId, httplib::Response &res)
     {
         auto jobs = service.getAllJobs(companyId);
-
+        std::cout << jobs.size() << std::endl;
         res.status = 200;
         res.set_content(json(jobs).dump(), "application/json");
     }

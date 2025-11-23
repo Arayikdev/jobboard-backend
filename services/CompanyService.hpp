@@ -20,18 +20,22 @@ using json = nlohmann::json;
 
 class CompanyService
 {
-    mongocxx::collection collection;
+    mongocxx::collection companycollection;
+    mongocxx::collection jobcollection;
 
 public:
-    CompanyService(mongocxx::collection db) : collection(db) {}
+    CompanyService(mongocxx::collection db, mongocxx::collection j) : companycollection(db), jobcollection(j) {}
     std::vector<json> getAllJobs(const bsoncxx::oid &companyId)
     {
         std::vector<json> jobs;
 
         bsoncxx::builder::basic::document filter{};
-        filter.append(bsoncxx::builder::basic::kvp("companyId", companyId));
+        filter.append(
+            bsoncxx::builder::basic::kvp("companyId", companyId.to_string()));
 
-        for (auto &&doc : collection.find(filter.view()))
+        std::cout << "FILTER = " << bsoncxx::to_json(filter.view()) << std::endl;
+
+        for (auto &&doc : jobcollection.find(filter.view()))
         {
             auto tmp = json::parse(bsoncxx::to_json(doc));
 
@@ -41,9 +45,10 @@ public:
 
         return jobs;
     }
+
     json getPublicCompany(const bsoncxx::oid &companyId)
     {
-        auto result = collection.find_one(
+        auto result = companycollection.find_one(
             bsoncxx::builder::basic::make_document(
                 bsoncxx::builder::basic::kvp("_id", companyId)));
 
@@ -62,7 +67,7 @@ public:
         using bsoncxx::builder::basic::make_document;
 
         // 1) Найти компанию
-        auto existing = collection.find_one(
+        auto existing = companycollection.find_one(
             make_document(kvp("_id", companyId)));
 
         if (!existing)
@@ -93,7 +98,7 @@ public:
             bsoncxx::types::b_date{std::chrono::system_clock::now()}));
 
         // 3) Выполнить обновление
-        auto result = collection.update_one(
+        auto result = companycollection.update_one(
             make_document(kvp("_id", companyId)),
             make_document(kvp("$set", setDoc.extract())));
 

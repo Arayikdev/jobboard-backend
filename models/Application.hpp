@@ -13,40 +13,6 @@
 
 using json = nlohmann::json;
 
-enum class ApplicationStatus
-{
-    Pending,
-    Accepted,
-    Rejected,
-    Unknown
-};
-
-inline std::string status_to_string(ApplicationStatus status)
-{
-    switch (status)
-    {
-    case ApplicationStatus::Pending:
-        return "pending";
-    case ApplicationStatus::Accepted:
-        return "accepted";
-    case ApplicationStatus::Rejected:
-        return "rejected";
-    default:
-        return "unknown";
-    }
-}
-
-inline ApplicationStatus string_to_status(const std::string &s)
-{
-    if (s == "pending")
-        return ApplicationStatus::Pending;
-    if (s == "accepted")
-        return ApplicationStatus::Accepted;
-    if (s == "rejected")
-        return ApplicationStatus::Rejected;
-    return ApplicationStatus::Unknown;
-}
-
 class Application
 {
 private:
@@ -55,7 +21,7 @@ private:
     std::string companyId;
     std::string message;
     std::string resumeUrl;
-    ApplicationStatus status;
+    std::string status;
     std::chrono::system_clock::time_point createdAt;
 
     bool validate_application_json(const json &j)
@@ -79,7 +45,7 @@ public:
         companyId = j["companyId"].get<std::string>();
         message = j["message"].get<std::string>();
         resumeUrl = j["resumeUrl"].get<std::string>();
-        status = string_to_status(j["status"].get<std::string>());
+        status = j["status"].get<std::string>();
         createdAt = std::chrono::system_clock::now();
     }
 
@@ -94,7 +60,7 @@ public:
             kvp("companyId", companyId),
             kvp("message", message),
             kvp("resumeUrl", resumeUrl),
-            kvp("status", status_to_string(status)),
+            kvp("status", status),
             kvp("createdAt", bsoncxx::types::b_date(createdAt)));
     }
 
@@ -106,7 +72,7 @@ public:
             {"companyId", companyId},
             {"message", message},
             {"resumeUrl", resumeUrl},
-            {"status", status_to_string(status)},
+            {"status", status},
             {"createdAt", std::chrono::duration_cast<std::chrono::milliseconds>(createdAt.time_since_epoch()).count()}};
     }
 };

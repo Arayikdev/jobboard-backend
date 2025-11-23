@@ -16,33 +16,6 @@
 
 using json = nlohmann::json;
 
-enum class Grade
-{
-    Junior,
-    Intern,
-    Unknown
-};
-
-Grade string_to_grade(std::string &&s)
-{
-    if (s == "Intern")
-        return Grade::Intern;
-    if (s == "Junior")
-        return Grade::Junior;
-    return Grade::Unknown;
-}
-
-std::string grade_to_string(Grade grade)
-{
-    switch (grade)
-    {
-    case Grade::Junior:
-        return "Junior";
-    case Grade::Intern:
-        return "Intern";
-    }
-    return "Unknown";
-}
 class User
 {
 private:
@@ -53,7 +26,7 @@ private:
     std::vector<std::string> programming_languages;
     std::vector<std::string> skills;
     std::vector<std::string> category;
-    Grade grade;
+    std::string grade;
     std::string location;
     std::string bio;
     bool isPublic;
@@ -75,7 +48,7 @@ public:
         updated_at = created_at;
         skills = {};
         programming_languages = {};
-        grade = Grade::Unknown;
+        grade = "Unknown";
         category = {};
         lastname = "";
     }
@@ -108,7 +81,7 @@ public:
             kvp("email", email),
             kvp("password", password),
             kvp("programming_languages", langs_builder.extract()),
-            kvp("grade", grade_to_string(grade)),
+            kvp("grade", grade),
             kvp("location", location),
             kvp("bio", bio),
             kvp("isPublic", isPublic),
@@ -128,7 +101,7 @@ public:
             {"email", email},
             {"password", password},
             {"programming_languages", programming_languages},
-            {"grade", grade_to_string(grade)},
+            {"grade", grade},
             {"location", location},
             {"bio", bio},
             {"lastname", lastname},

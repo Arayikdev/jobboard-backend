@@ -17,14 +17,20 @@ public:
     // GET /users
     void getUsers(const httplib::Request &req, httplib::Response &res)
     {
-        try {
-            auto users = service.getUsers();
+        try
+        {
+            auto users = service.getUsers(req);
+
+            json response = {
+                {"users", users}};
+
             res.status = 200;
-            res.set_content(json(users).dump(), "application/json");
+            res.set_content(response.dump(), "application/json");
         }
-        catch (...) {
+        catch (std::exception &e)
+        {
             res.status = 500;
-            res.set_content("Server error", "text/plain");
+            res.set_content("{\"error\":\"Failed to fetch users\"}", "application/json");
         }
     }
 
@@ -37,10 +43,12 @@ public:
         std::string pathId = req.matches[1].str();
 
         // 1. Owner → return full profile
-        if (loggedIn && tokenUserId == pathId) {
+        if (loggedIn && tokenUserId == pathId)
+        {
             auto fullUser = service.getOnePrivate(bsoncxx::oid(pathId));
 
-            if (fullUser.is_null()) {
+            if (fullUser.is_null())
+            {
                 res.status = 404;
                 res.set_content("User not found", "text/plain");
                 return;
@@ -54,7 +62,8 @@ public:
         // 2. Public profile
         auto publicUser = service.getOnePublic(bsoncxx::oid(pathId));
 
-        if (publicUser.is_null()) {
+        if (publicUser.is_null())
+        {
             res.status = 404;
             res.set_content("User not found or private", "text/plain");
             return;
@@ -71,17 +80,20 @@ public:
     {
         std::string pathId = req.matches[1].str();
 
-        if (tokenUserId != pathId) {
+        if (tokenUserId != pathId)
+        {
             res.status = 403;
             res.set_content("Cannot update another user's profile", "text/plain");
             return;
         }
 
         json body;
-        try {
+        try
+        {
             body = json::parse(req.body);
         }
-        catch (...) {
+        catch (...)
+        {
             res.status = 400;
             res.set_content("Invalid JSON", "text/plain");
             return;
@@ -89,7 +101,8 @@ public:
 
         bool ok = service.updateProfile(pathId, body);
 
-        if (!ok) {
+        if (!ok)
+        {
             res.status = 404;
             res.set_content("User not found", "text/plain");
             return;

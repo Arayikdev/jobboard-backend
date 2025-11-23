@@ -14,6 +14,7 @@ void registerJobRoutes(httplib::Server &server, JobController &jobController)
     server.Get(R"(/jobs/([a-fA-F0-9]{24}))",
                [&](const httplib::Request &req, httplib::Response &res)
                {
+                
                    res.set_header("Access-Control-Allow-Origin", "*");
                    jobController.getJobByObjectId(req, res);
                });
