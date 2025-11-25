@@ -1,19 +1,18 @@
 #pragma once
-#include "../utils/jwt.hpp"
 #include "../third_party/httplib.h"
+#include "../utils/jwt.hpp"
 #include <string>
 
 class AuthMiddleware {
 public:
-    // -------------------------
-    // COMPANY ONLY MIDDLEWARE
-    // -------------------------
+    // ---------------------------------------------------------
+    // 1) COMPANY-ONLY ACCESS
+    // ---------------------------------------------------------
     static bool verifyCompany(const httplib::Request &req,
                               httplib::Response &res,
                               std::string &outUserId) 
     {
-        const std::string secret = "SECRET_KEY";
-
+        // Expect: Authorization: Bearer <token>
         auto auth = req.get_header_value("Authorization");
         if (auth.rfind("Bearer ", 0) != 0) {
             res.status = 401;
@@ -24,58 +23,51 @@ public:
         std::string token = auth.substr(7);
 
         try {
-            auto decoded = jwt::decode(token);
+            auto decoded = JWT::verify(token);
 
-            jwt::verify()
-                .allow_algorithm(jwt::algorithm::hs256{secret})
-                .with_issuer("cpp-backend")
-                .verify(decoded);
-
-            auto role = decoded.get_payload_claim("role").as_string();
+            // Extract and validate role
+            std::string role = decoded.get_payload_claim("role").as_string();
             if (role != "company") {
                 res.status = 403;
-                res.set_content("Only companies can post jobs", "text/plain");
+                res.set_content("Access denied: only companies are allowed", "text/plain");
                 return false;
             }
 
+            // Extract userId
             outUserId = decoded.get_payload_claim("userId").as_string();
             return true;
-        }
-        catch (...) {
+
+        } catch (...) {
             res.status = 401;
             res.set_content("Invalid or expired token", "text/plain");
             return false;
         }
     }
 
-    // -------------------------
-    // GENERAL USER MIDDLEWARE
-    // -------------------------
+    // ---------------------------------------------------------
+    // 2) GENERAL USER ACCESS (optional for GET)
+    // ---------------------------------------------------------
     static bool verifyUser(const httplib::Request &req,
                            httplib::Response &res,
                            std::string &outUserId)
     {
-        const std::string secret = "SECRET_KEY";
-
         auto auth = req.get_header_value("Authorization");
+
+        // If no token → not authorized, but allowed for GET endpoints
         if (auth.rfind("Bearer ", 0) != 0) {
-            return false; // No token → not logged in (but allowed for GET)
+            return false; 
         }
 
         std::string token = auth.substr(7);
 
         try {
-            auto decoded = jwt::decode(token);
+            auto decoded = JWT::verify(token);
 
-            jwt::verify()
-                .allow_algorithm(jwt::algorithm::hs256{secret})
-                .with_issuer("cpp-backend")
-                .verify(decoded);
-
+            // Extract userId
             outUserId = decoded.get_payload_claim("userId").as_string();
             return true;
-        }
-        catch (...) {
+
+        } catch (...) {
             res.status = 401;
             res.set_content("Invalid or expired token", "text/plain");
             return false;

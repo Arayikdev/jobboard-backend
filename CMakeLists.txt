@@ -31,3 +31,10 @@ target_link_libraries(server
     OpenSSL::Crypto
     Threads::Threads
 )
+
+# Test executable
+add_executable(test_application tests/test_application.cpp)
+target_link_libraries(test_application
+    ${MONGOCXX_LIBRARIES}
+    ${BSONCXX_LIBRARIES}
+)

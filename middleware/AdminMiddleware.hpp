@@ -4,20 +4,13 @@
 
 class AdminMiddleware {
 public:
-
-    static bool check(const httplib::Request &req, httplib::Response &res) 
+    static bool check(const httplib::Request &req, httplib::Response &res)
     {
-        if (!req.has_header("Authorization")) {
-            res.status = 401;
-            res.set_content("Missing Authorization header", "text/plain");
-            return false;
-        }
-
-        std::string auth = req.get_header_value("Authorization");
+        auto auth = req.get_header_value("Authorization");
 
         if (auth.rfind("Bearer ", 0) != 0) {
             res.status = 401;
-            res.set_content("Invalid token format", "text/plain");
+            res.set_content("Missing or invalid Authorization header", "text/plain");
             return false;
         }
 
@@ -34,8 +27,8 @@ public:
             }
 
             return true;
-        }
-        catch (...) {
+
+        } catch (...) {
             res.status = 401;
             res.set_content("Invalid or expired token", "text/plain");
             return false;

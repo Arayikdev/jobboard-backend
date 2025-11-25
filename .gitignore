@@ -1,4 +1,14 @@
 tmp.cpp
+tmp
 server
 third_party
 .env
+build/
+*.pid
+*.log
+*.out
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+filterData.js

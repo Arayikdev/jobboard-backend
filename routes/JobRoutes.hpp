@@ -2,6 +2,7 @@
 #include "../third_party/httplib.h"
 #include "../controllers/JobController.hpp"
 #include "../middleware/AuthMiddleware.hpp"
+#include "../middleware/AdminMiddleware.hpp"
 
 void registerJobRoutes(httplib::Server &server, JobController &jobController)
 {
@@ -14,7 +15,6 @@ void registerJobRoutes(httplib::Server &server, JobController &jobController)
     server.Get(R"(/jobs/([a-fA-F0-9]{24}))",
                [&](const httplib::Request &req, httplib::Response &res)
                {
-                
                    res.set_header("Access-Control-Allow-Origin", "*");
                    jobController.getJobByObjectId(req, res);
                });
@@ -48,10 +48,21 @@ void registerJobRoutes(httplib::Server &server, JobController &jobController)
     server.Delete(R"(/jobs/([a-fA-F0-9]{24}))",
                   [&](const httplib::Request &req, httplib::Response &res)
                   {
-                      std::string companyId;
+                      std::string dummy;
 
+                      // 1) First admin check — if OK → done
+                      if (AdminMiddleware::check(req, res))
+                      {
+                          res.set_header("Access-Control-Allow-Origin", "*");
+                          jobController.admindeletejob(req, res);
+                          return;
+                      }
+
+                      // 2) Admin is NOT → try company
+                      std::string companyId;
                       if (!AuthMiddleware::verifyCompany(req, res, companyId))
                       {
+                          // middleware already returned error (401 or 403)
                           return;
                       }
 

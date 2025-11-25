@@ -1,5 +1,6 @@
 #include "config/Database.hpp"
 #include "models/Company.hpp"
+#include "routes/AdminRoutes.hpp"
 #include "routes/ApplicationRoutes.hpp"
 #include "routes/AuthRoutes.hpp"
 #include "routes/CompanyRoutes.hpp"
@@ -23,7 +24,7 @@ int main() {
                  [&](const httplib::Request &req, httplib::Response &res) {
                    res.set_header("Access-Control-Allow-Origin", "*");
                    res.set_header("Access-Control-Allow-Methods",
-                                  "GET, POST, PUT, DELETE, OPTIONS");
+                                  "GET, POST, PUT, DELETE, PATCH, OPTIONS");
                    res.set_header("Access-Control-Allow-Headers",
                                   "Content-Type, Authorization");
                    res.status = 200;
@@ -49,6 +50,9 @@ int main() {
 
   ApplicationController applicationController(applicationservice, jobservice);
 
+  AdminService adminservice(jobCollection);
+  AdminController admincontroller(adminservice);
+
   registerApplicationRoutes(server, applicationController);
 
   registerUserRoutes(server, userController);
@@ -57,6 +61,7 @@ int main() {
   login(server, authcontroller);
   registerJobRoutes(server, jobcontroller);
   registerCompanyRoutes(server, companycontroller);
+  registerAdminRoutes(server, admincontroller);
 
   std::cout << "🚀 Server running on http://0.0.0.0:8080\n";
   server.listen("0.0.0.0", 8080);
