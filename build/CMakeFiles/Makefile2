@@ -64,6 +64,7 @@ CMAKE_BINARY_DIR = /home/arayik/thread/c++/backend/build
 
 # The main recursive "all" target.
 all: CMakeFiles/server.dir/all
+all: CMakeFiles/test_application.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -72,6 +73,7 @@ preinstall:
 
 # The main recursive "clean" target.
 clean: CMakeFiles/server.dir/clean
+clean: CMakeFiles/test_application.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -99,6 +101,32 @@ server: CMakeFiles/server.dir/rule
 CMakeFiles/server.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/clean
 .PHONY : CMakeFiles/server.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/test_application.dir
+
+# All Build rule for target.
+CMakeFiles/test_application.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_application.dir/build.make CMakeFiles/test_application.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_application.dir/build.make CMakeFiles/test_application.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/arayik/thread/c++/backend/build/CMakeFiles --progress-num=3,4 "Built target test_application"
+.PHONY : CMakeFiles/test_application.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/test_application.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/arayik/thread/c++/backend/build/CMakeFiles 2
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/test_application.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/arayik/thread/c++/backend/build/CMakeFiles 0
+.PHONY : CMakeFiles/test_application.dir/rule
+
+# Convenience name for target.
+test_application: CMakeFiles/test_application.dir/rule
+.PHONY : test_application
+
+# clean rule for target.
+CMakeFiles/test_application.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_application.dir/build.make CMakeFiles/test_application.dir/clean
+.PHONY : CMakeFiles/test_application.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

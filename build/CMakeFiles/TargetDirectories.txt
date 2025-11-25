@@ -1,3 +1,4 @@
 /home/arayik/thread/c++/backend/build/CMakeFiles/server.dir
+/home/arayik/thread/c++/backend/build/CMakeFiles/test_application.dir
 /home/arayik/thread/c++/backend/build/CMakeFiles/edit_cache.dir
 /home/arayik/thread/c++/backend/build/CMakeFiles/rebuild_cache.dir

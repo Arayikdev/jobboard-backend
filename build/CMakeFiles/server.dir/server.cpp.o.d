@@ -504,8 +504,9 @@ CMakeFiles/server.dir/server.cpp.o: \
  /usr/local/include/bsoncxx/v_noabi/bsoncxx/builder/stream/single_context.hpp \
  /usr/local/include/bsoncxx/v_noabi/bsoncxx/json.hpp \
  /usr/local/include/bsoncxx/v_noabi/bsoncxx/json-fwd.hpp \
- /home/arayik/thread/c++/backend/routes/ApplicationRoutes.hpp \
- /home/arayik/thread/c++/backend/routes/../third_party/httplib.h \
+ /home/arayik/thread/c++/backend/routes/AdminRoutes.hpp \
+ /home/arayik/thread/c++/backend/routes/../controllers/AdminController.hpp \
+ /home/arayik/thread/c++/backend/routes/../controllers/../third_party/httplib.h \
  /usr/include/arpa/inet.h /usr/include/netinet/in.h \
  /usr/include/x86_64-linux-gnu/sys/socket.h \
  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
@@ -617,17 +618,10 @@ CMakeFiles/server.dir/server.cpp.o: \
  /usr/include/c++/13/bits/this_thread_sleep.h \
  /usr/include/c++/13/unordered_set \
  /usr/include/c++/13/bits/unordered_set.h \
- /home/arayik/thread/c++/backend/routes/../controllers/ApplicationController.hpp \
- /home/arayik/thread/c++/backend/routes/../controllers/../third_party/httplib.h \
- /home/arayik/thread/c++/backend/routes/../controllers/../third_party/json.hpp \
- /home/arayik/thread/c++/backend/routes/../controllers/../services/ApplicationService.hpp \
- /home/arayik/thread/c++/backend/routes/../controllers/../services/../models/Application.hpp \
- /home/arayik/thread/c++/backend/routes/../controllers/../services/../models/../third_party/json.hpp \
+ /home/arayik/thread/c++/backend/routes/../controllers/../services/AdminService.hpp \
  /home/arayik/thread/c++/backend/routes/../controllers/../services/../third_party/json.hpp \
- /home/arayik/thread/c++/backend/routes/../controllers/../services/JobService.hpp \
- /home/arayik/thread/c++/backend/routes/../controllers/../services/../models/Job.hpp \
- /home/arayik/thread/c++/backend/routes/../controllers/../services/../third_party/httplib.h \
- /home/arayik/thread/c++/backend/routes/../middleware/AuthMiddleware.hpp \
+ /home/arayik/thread/c++/backend/routes/../controllers/../third_party/json.hpp \
+ /home/arayik/thread/c++/backend/routes/../middleware/AdminMiddleware.hpp \
  /home/arayik/thread/c++/backend/routes/../middleware/../utils/jwt.hpp \
  /home/arayik/thread/c++/backend/routes/../middleware/../utils/../third_party/jwt-cpp/include/jwt-cpp/jwt.h \
  /home/arayik/thread/c++/backend/routes/../middleware/../utils/../third_party/jwt-cpp/include/jwt-cpp/../picojson/picojson.h \
@@ -676,6 +670,16 @@ CMakeFiles/server.dir/server.cpp.o: \
  /home/arayik/thread/c++/backend/routes/../middleware/../utils/../third_party/jwt-cpp/include/jwt-cpp/traits/kazuho-picojson/../../../picojson/picojson.h \
  /home/arayik/thread/c++/backend/routes/../middleware/../utils/../third_party/jwt-cpp/include/jwt-cpp/traits/kazuho-picojson/../../../jwt-cpp/jwt.h \
  /home/arayik/thread/c++/backend/routes/../middleware/../third_party/httplib.h \
+ /home/arayik/thread/c++/backend/routes/../third_party/httplib.h \
+ /home/arayik/thread/c++/backend/routes/ApplicationRoutes.hpp \
+ /home/arayik/thread/c++/backend/routes/../controllers/ApplicationController.hpp \
+ /home/arayik/thread/c++/backend/routes/../controllers/../services/ApplicationService.hpp \
+ /home/arayik/thread/c++/backend/routes/../controllers/../services/../models/Application.hpp \
+ /home/arayik/thread/c++/backend/routes/../controllers/../services/../models/../third_party/json.hpp \
+ /home/arayik/thread/c++/backend/routes/../controllers/../services/JobService.hpp \
+ /home/arayik/thread/c++/backend/routes/../controllers/../services/../models/Job.hpp \
+ /home/arayik/thread/c++/backend/routes/../controllers/../services/../third_party/httplib.h \
+ /home/arayik/thread/c++/backend/routes/../middleware/AuthMiddleware.hpp \
  /home/arayik/thread/c++/backend/routes/AuthRoutes.hpp \
  /home/arayik/thread/c++/backend/routes/../controllers/UserAuthController.hpp \
  /home/arayik/thread/c++/backend/routes/../controllers/../services/UserAuthService.hpp \

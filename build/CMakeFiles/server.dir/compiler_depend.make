@@ -14,6 +14,7 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
   /home/arayik/thread/c++/backend/third_party/httplib.h \
   /home/arayik/thread/c++/backend/third_party/json.hpp \
   /home/arayik/thread/c++/backend/utils/Password.hpp \
+  /home/arayik/thread/c++/backend/services/AdminService.hpp \
   /home/arayik/thread/c++/backend/services/ApplicationService.hpp \
   /home/arayik/thread/c++/backend/services/AuthService.hpp \
   /home/arayik/thread/c++/backend/services/CompanyAuthService.hpp \
@@ -23,6 +24,7 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
   /home/arayik/thread/c++/backend/services/UserService.hpp \
   /home/arayik/thread/c++/backend/third_party/httplib.h \
   /home/arayik/thread/c++/backend/third_party/json.hpp \
+  /home/arayik/thread/c++/backend/controllers/AdminController.hpp \
   /home/arayik/thread/c++/backend/controllers/ApplicationController.hpp \
   /home/arayik/thread/c++/backend/controllers/AuthController.hpp \
   /home/arayik/thread/c++/backend/controllers/CompanyAuthController.hpp \
@@ -39,8 +41,10 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
   /home/arayik/thread/c++/backend/third_party/jwt-cpp/include/jwt-cpp/traits/kazuho-picojson/defaults.h \
   /home/arayik/thread/c++/backend/third_party/jwt-cpp/include/jwt-cpp/traits/kazuho-picojson/traits.h \
   /home/arayik/thread/c++/backend/utils/jwt.hpp \
+  /home/arayik/thread/c++/backend/middleware/AdminMiddleware.hpp \
   /home/arayik/thread/c++/backend/middleware/AuthMiddleware.hpp \
   /home/arayik/thread/c++/backend/third_party/httplib.h \
+  /home/arayik/thread/c++/backend/routes/AdminRoutes.hpp \
   /home/arayik/thread/c++/backend/routes/ApplicationRoutes.hpp \
   /home/arayik/thread/c++/backend/routes/AuthRoutes.hpp \
   /home/arayik/thread/c++/backend/routes/CompanyRoutes.hpp \
@@ -1170,7 +1174,11 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/time_members.h:
 
-/usr/include/c++/13/bits/stl_algobase.h:
+/usr/include/x86_64-linux-gnu/c++/13/bits/opt_random.h:
+
+/usr/include/x86_64-linux-gnu/sys/select.h:
+
+/usr/include/x86_64-linux-gnu/c++/13/bits/messages_members.h:
 
 /usr/include/c++/13/pstl/pstl_config.h:
 
@@ -1179,10 +1187,6 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 /usr/include/c++/13/bits/regex_automaton.h:
 
 /usr/include/c++/13/bits/mask_array.h:
-
-/usr/include/c++/13/random:
-
-/usr/include/c++/13/bits/random.tcc:
 
 /usr/include/c++/13/pstl/glue_numeric_defs.h:
 
@@ -1221,6 +1225,10 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 /usr/include/c++/13/exception:
 
 /usr/include/c++/13/cwchar:
+
+/usr/include/x86_64-linux-gnu/c++/13/bits/gthr.h:
+
+/usr/include/c++/13/cstring:
 
 /usr/include/c++/13/csignal:
 
@@ -1264,14 +1272,6 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 
 /usr/include/c++/13/optional:
 
-/usr/include/c++/13/bits/valarray_after.h:
-
-/usr/include/c++/13/pstl/glue_memory_defs.h:
-
-/usr/include/c++/13/bits/memory_resource.h:
-
-/usr/include/c++/13/streambuf:
-
 /usr/include/c++/13/mutex:
 
 /usr/local/include/bsoncxx/v_noabi/bsoncxx/builder/basic/sub_array-fwd.hpp:
@@ -1281,8 +1281,6 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 /usr/local/include/mongocxx/v1/config/version.hpp:
 
 /usr/include/c++/13/ostream:
-
-/usr/include/x86_64-linux-gnu/c++/13/bits/opt_random.h:
 
 /usr/include/c++/13/bits/streambuf_iterator.h:
 
@@ -1324,6 +1322,8 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 
 /usr/include/c++/13/cinttypes:
 
+/home/arayik/thread/c++/backend/middleware/AdminMiddleware.hpp:
+
 /usr/include/c++/13/stack:
 
 /usr/include/c++/13/bits/stl_raw_storage_iter.h:
@@ -1349,6 +1349,8 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 /usr/include/c++/13/bits/stl_deque.h:
 
 /usr/include/x86_64-linux-gnu/asm/param.h:
+
+/usr/include/c++/13/bits/stl_algobase.h:
 
 /usr/include/c++/13/cstddef:
 
@@ -1383,16 +1385,6 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 /usr/include/openssl/pemerr.h:
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/ctype_inline.h:
-
-/usr/local/include/bsoncxx/v_noabi/bsoncxx/builder/basic/document-fwd.hpp:
-
-/usr/include/openssl/asyncerr.h:
-
-/usr/include/c++/13/ratio:
-
-/usr/local/include/bsoncxx/v_noabi/bsoncxx/builder/basic/document.hpp:
-
-/usr/include/linux/limits.h:
 
 /usr/include/c++/13/cwctype:
 
@@ -1436,9 +1428,15 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 
 /usr/include/openssl/rsaerr.h:
 
-/usr/include/c++/13/backward/auto_ptr.h:
+/usr/include/c++/13/bits/range_access.h:
 
-/usr/include/assert.h:
+/usr/include/c++/13/bits/random.tcc:
+
+/usr/include/c++/13/random:
+
+/usr/local/include/mongocxx/v_noabi/mongocxx/bulk_write.hpp:
+
+/home/arayik/thread/c++/backend/routes/AuthRoutes.hpp:
 
 /usr/include/c++/13/algorithm:
 
@@ -1452,23 +1450,9 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 
 /usr/include/asm-generic/posix_types.h:
 
-/usr/include/c++/13/set:
-
-/home/arayik/thread/c++/backend/controllers/JobController.hpp:
-
-/usr/local/include/bsoncxx/v_noabi/bsoncxx/builder/basic/sub_binary-fwd.hpp:
-
-/usr/include/c++/13/bits/shared_ptr_atomic.h:
-
 /usr/local/include/mongocxx/v_noabi/mongocxx/model/update_one.hpp:
 
 /usr/include/asm-generic/int-ll64.h:
-
-/usr/include/c++/13/bits/stl_bvector.h:
-
-/usr/include/c++/13/bits/allocator.h:
-
-/usr/include/c++/13/unordered_map:
 
 /usr/local/include/mongocxx/v_noabi/mongocxx/options/index-fwd.hpp:
 
@@ -1498,6 +1482,24 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 
 /usr/include/openssl/obj_mac.h:
 
+/usr/include/c++/13/bits/stl_bvector.h:
+
+/usr/include/c++/13/bits/allocator.h:
+
+/usr/include/c++/13/unordered_map:
+
+/usr/include/c++/13/bits/valarray_after.h:
+
+/usr/include/c++/13/pstl/glue_memory_defs.h:
+
+/usr/include/c++/13/bits/memory_resource.h:
+
+/usr/include/c++/13/streambuf:
+
+/home/arayik/thread/c++/backend/routes/AdminRoutes.hpp:
+
+/usr/include/openssl/sslerr.h:
+
 /home/arayik/thread/c++/backend/middleware/AuthMiddleware.hpp:
 
 /usr/local/include/mongocxx/v_noabi/mongocxx/events/heartbeat_succeeded_event-fwd.hpp:
@@ -1508,41 +1510,9 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 
 /usr/include/openssl/objectserr.h:
 
-/usr/include/openssl/dh.h:
+/usr/include/c++/13/backward/auto_ptr.h:
 
-/usr/include/c++/13/bits/stl_iterator_base_funcs.h:
-
-/usr/include/asm-generic/errno-base.h:
-
-/usr/include/c++/13/iostream:
-
-/usr/include/asm-generic/errno.h:
-
-/usr/include/c++/13/numeric:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h:
-
-/usr/include/c++/13/iterator:
-
-/usr/include/c++/13/bits/ios_base.h:
-
-/usr/local/include/bsoncxx/v_noabi/bsoncxx/builder/basic/sub_document-fwd.hpp:
-
-/usr/include/openssl/hmac.h:
-
-/home/arayik/thread/c++/backend/services/CompanyAuthService.hpp:
-
-/usr/include/c++/13/bits/stream_iterator.h:
-
-/usr/local/include/mongocxx/v_noabi/mongocxx/events/command_started_event.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/uio_lim.h:
-
-/usr/include/asm-generic/bitsperlong.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
-
-/usr/include/c++/13/bits/algorithmfwd.h:
+/usr/include/assert.h:
 
 /home/arayik/thread/c++/backend/utils/Password.hpp:
 
@@ -1556,13 +1526,17 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 
 /usr/include/asm-generic/socket.h:
 
+/usr/local/include/mongocxx/v_noabi/mongocxx/hint-fwd.hpp:
+
+/home/arayik/thread/c++/backend/third_party/jwt-cpp/include/jwt-cpp/traits/kazuho-picojson/defaults.h:
+
 /usr/include/openssl/conf.h:
 
 /usr/include/c++/13/bits/parse_numbers.h:
 
-/usr/include/linux/errno.h:
+/usr/include/c++/13/bits/ios_base.h:
 
-/usr/include/c++/13/bits/std_abs.h:
+/usr/include/c++/13/iterator:
 
 /home/arayik/thread/c++/backend/controllers/UserController.hpp:
 
@@ -1570,15 +1544,17 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 
 /usr/include/openssl/dsaerr.h:
 
+/usr/include/c++/13/bits/std_abs.h:
+
+/usr/include/linux/errno.h:
+
+/home/arayik/thread/c++/backend/services/AdminService.hpp:
+
 /home/arayik/thread/c++/backend/config/Database.hpp:
 
 /usr/local/include/bsoncxx/v1/stdx/optional.hpp:
 
 /home/arayik/thread/c++/backend/models/User.hpp:
-
-/usr/local/include/mongocxx/v_noabi/mongocxx/gridfs/downloader.hpp:
-
-/usr/include/c++/13/bits/allocated_ptr.h:
 
 /home/arayik/thread/c++/backend/models/Application.hpp:
 
@@ -1590,21 +1566,57 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 
 /usr/include/x86_64-linux-gnu/bits/endianness.h:
 
-/usr/include/c++/13/fstream:
-
-/usr/local/include/mongocxx/v_noabi/mongocxx/read_concern.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/signum-arch.h:
-
-/home/arayik/thread/c++/backend/utils/jwt.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
-
-/usr/include/c++/13/bits/fs_path.h:
-
 /usr/include/c++/13/cassert:
 
 /usr/include/c++/13/bits/cpp_type_traits.h:
+
+/home/arayik/thread/c++/backend/controllers/JobController.hpp:
+
+/usr/local/include/bsoncxx/v_noabi/bsoncxx/builder/basic/sub_binary-fwd.hpp:
+
+/usr/include/c++/13/bits/shared_ptr_atomic.h:
+
+/usr/include/c++/13/set:
+
+/usr/include/asm-generic/errno-base.h:
+
+/usr/include/openssl/dh.h:
+
+/usr/include/c++/13/bits/stl_iterator_base_funcs.h:
+
+/usr/include/asm-generic/bitsperlong.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
+
+/usr/local/include/bsoncxx/v_noabi/bsoncxx/builder/basic/sub_document-fwd.hpp:
+
+/usr/include/openssl/hmac.h:
+
+/home/arayik/thread/c++/backend/services/CompanyAuthService.hpp:
+
+/usr/include/c++/13/bits/stream_iterator.h:
+
+/usr/local/include/mongocxx/v_noabi/mongocxx/events/command_started_event.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/uio_lim.h:
+
+/home/arayik/thread/c++/backend/third_party/jwt-cpp/include/jwt-cpp/traits/kazuho-picojson/traits.h:
+
+/usr/include/c++/13/bits/functexcept.h:
+
+/usr/include/c++/13/forward_list:
+
+/usr/include/c++/13/bits/node_handle.h:
+
+/home/arayik/thread/c++/backend/third_party/json.hpp:
+
+/usr/include/c++/13/iostream:
+
+/usr/include/asm-generic/errno.h:
+
+/usr/include/c++/13/numeric:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h:
 
 /usr/include/c++/13/atomic:
 
@@ -1626,9 +1638,31 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 
 /home/arayik/thread/c++/backend/controllers/CompanyController.hpp:
 
-/usr/include/c++/13/bits/range_access.h:
-
 /usr/include/c++/13/utility:
+
+/home/arayik/thread/c++/backend/controllers/AdminController.hpp:
+
+/usr/local/include/mongocxx/v_noabi/mongocxx/gridfs/downloader.hpp:
+
+/usr/include/c++/13/bits/allocated_ptr.h:
+
+/usr/include/c++/13/fstream:
+
+/usr/local/include/mongocxx/v_noabi/mongocxx/read_concern.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/signum-arch.h:
+
+/usr/include/c++/13/bits/fs_path.h:
+
+/home/arayik/thread/c++/backend/utils/jwt.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+
+/usr/include/c++/13/bits/algorithmfwd.h:
+
+/usr/include/openssl/ecdsa.h:
+
+/usr/include/c++/13/experimental/bits/lfts_config.h:
 
 /usr/local/include/mongocxx/v_noabi/mongocxx/model/delete_one.hpp:
 
@@ -1648,33 +1682,11 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 
 /usr/include/c++/13/condition_variable:
 
-/usr/local/include/mongocxx/v_noabi/mongocxx/hint-fwd.hpp:
-
-/home/arayik/thread/c++/backend/third_party/jwt-cpp/include/jwt-cpp/traits/kazuho-picojson/defaults.h:
-
-/home/arayik/thread/c++/backend/third_party/json.hpp:
+/usr/include/x86_64-linux-gnu/c++/13/bits/error_constants.h:
 
 /usr/include/openssl/opensslv.h:
 
 /usr/include/c++/13/bits/predefined_ops.h:
-
-/usr/include/x86_64-linux-gnu/c++/13/bits/error_constants.h:
-
-/home/arayik/thread/c++/backend/third_party/jwt-cpp/include/jwt-cpp/traits/kazuho-picojson/traits.h:
-
-/usr/include/c++/13/bits/functexcept.h:
-
-/usr/include/c++/13/forward_list:
-
-/usr/local/include/mongocxx/v_noabi/mongocxx/bulk_write.hpp:
-
-/home/arayik/thread/c++/backend/routes/AuthRoutes.hpp:
-
-/usr/include/c++/13/experimental/bits/lfts_config.h:
-
-/usr/include/openssl/ecdsa.h:
-
-/usr/include/c++/13/bits/node_handle.h:
 
 /usr/include/x86_64-linux-gnu/sys/ucontext.h:
 
@@ -1713,10 +1725,6 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 /usr/include/c++/13/bits/deque.tcc:
 
 /usr/include/asm-generic/param.h:
-
-/usr/include/x86_64-linux-gnu/sys/select.h:
-
-/usr/include/x86_64-linux-gnu/c++/13/bits/messages_members.h:
 
 /usr/local/include/bsoncxx/v_noabi/bsoncxx/builder/stream/document-fwd.hpp:
 
@@ -1900,6 +1908,16 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 
 /usr/include/c++/13/bits/quoted_string.h:
 
+/usr/local/include/bsoncxx/v_noabi/bsoncxx/builder/basic/document-fwd.hpp:
+
+/usr/include/openssl/asyncerr.h:
+
+/usr/include/c++/13/ratio:
+
+/usr/local/include/bsoncxx/v_noabi/bsoncxx/builder/basic/document.hpp:
+
+/usr/include/linux/limits.h:
+
 /usr/include/c++/13/sstream:
 
 /usr/include/c++/13/bits/nested_exception.h:
@@ -2044,9 +2062,9 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/c++allocator.h:
 
-/usr/include/c++/13/debug/debug.h:
-
 /usr/include/c++/13/bits/stl_list.h:
+
+/usr/include/c++/13/debug/debug.h:
 
 /usr/include/openssl/bnerr.h:
 
@@ -2127,8 +2145,6 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 /usr/include/c++/13/bits/exception_ptr.h:
 
 /usr/include/x86_64-linux-gnu/bits/stat.h:
-
-/usr/include/openssl/sslerr.h:
 
 /usr/include/openssl/sslerr_legacy.h:
 
@@ -2410,6 +2426,12 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h:
 
+/usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/FILE.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
+
 /usr/include/x86_64-linux-gnu/bits/typesizes.h:
 
 /usr/include/x86_64-linux-gnu/bits/uintn-identity.h:
@@ -2443,13 +2465,3 @@ CMakeFiles/server.dir/server.cpp.o: /home/arayik/thread/c++/backend/server.cpp \
 /usr/include/c++/13/bits/ostream.tcc:
 
 /usr/include/x86_64-linux-gnu/c++/13/bits/c++locale.h:
-
-/usr/include/c++/13/cstring:
-
-/usr/include/x86_64-linux-gnu/c++/13/bits/gthr.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/FILE.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
-
-/usr/include/x86_64-linux-gnu/c++/13/bits/os_defines.h:
