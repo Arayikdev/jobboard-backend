@@ -9,7 +9,8 @@
 #include "third_party/httplib.h"
 #include "utils/jwt.hpp"
 
-int main() {
+int main()
+{
   // Initializing Database
   Env::load();
   Database database;
@@ -23,7 +24,8 @@ int main() {
 
   httplib::Server server;
   server.Options(".*",
-                 [&](const httplib::Request &req, httplib::Response &res) {
+                 [&](const httplib::Request &req, httplib::Response &res)
+                 {
                    res.set_header("Access-Control-Allow-Origin", "*");
                    res.set_header("Access-Control-Allow-Methods",
                                   "GET, POST, PUT, DELETE, PATCH, OPTIONS");
@@ -65,6 +67,10 @@ int main() {
   registerCompanyRoutes(server, companycontroller);
   registerAdminRoutes(server, admincontroller);
 
+  const char *portEnv = std::getenv("PORT");
+  int port = portEnv ? std::stoi(portEnv) : 8080;
+
+  server.listen("0.0.0.0", port);
+
   std::cout << "🚀 Server running on http://0.0.0.0:8080\n";
-  server.listen("0.0.0.0", 8080);
 }
