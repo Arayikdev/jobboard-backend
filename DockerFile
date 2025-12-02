@@ -1,0 +1,35 @@
+# ========================
+# Stage 1: Build
+# ========================
+FROM ubuntu:22.04 AS builder
+
+RUN apt-get update && apt-get install -y \
+    g++ cmake make git pkg-config \
+    libssl-dev libsasl2-dev libcurl4-openssl-dev \
+    libmongocxx-dev libbsoncxx-dev \
+    ca-certificates
+
+WORKDIR /app
+
+COPY . .
+
+RUN mkdir build && cd build && cmake .. && make -j$(nproc)
+
+
+# ========================
+# Stage 2: Runtime
+# ========================
+FROM ubuntu:22.04
+
+RUN apt-get update && apt-get install -y \
+    libssl-dev libsasl2-dev libcurl4-openssl-dev \
+    libmongocxx-dev libbsoncxx-dev \
+    ca-certificates
+
+WORKDIR /app
+
+COPY --from=builder /app/build/server /app/server
+
+EXPOSE 8080
+
+CMD ["./server"]
