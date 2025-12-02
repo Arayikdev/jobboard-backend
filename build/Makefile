@@ -129,19 +129,6 @@ server/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/build
 .PHONY : server/fast
 
-#=============================================================================
-# Target rules for targets named test_application
-
-# Build rule for target.
-test_application: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_application
-.PHONY : test_application
-
-# fast build rule for target.
-test_application/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_application.dir/build.make CMakeFiles/test_application.dir/build
-.PHONY : test_application/fast
-
 server.o: server.cpp.o
 .PHONY : server.o
 
@@ -166,30 +153,6 @@ server.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/server.dir/build.make CMakeFiles/server.dir/server.cpp.s
 .PHONY : server.cpp.s
 
-tests/test_application.o: tests/test_application.cpp.o
-.PHONY : tests/test_application.o
-
-# target to build an object file
-tests/test_application.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_application.dir/build.make CMakeFiles/test_application.dir/tests/test_application.cpp.o
-.PHONY : tests/test_application.cpp.o
-
-tests/test_application.i: tests/test_application.cpp.i
-.PHONY : tests/test_application.i
-
-# target to preprocess a source file
-tests/test_application.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_application.dir/build.make CMakeFiles/test_application.dir/tests/test_application.cpp.i
-.PHONY : tests/test_application.cpp.i
-
-tests/test_application.s: tests/test_application.cpp.s
-.PHONY : tests/test_application.s
-
-# target to generate assembly for a file
-tests/test_application.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test_application.dir/build.make CMakeFiles/test_application.dir/tests/test_application.cpp.s
-.PHONY : tests/test_application.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -199,13 +162,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... server"
-	@echo "... test_application"
 	@echo "... server.o"
 	@echo "... server.i"
 	@echo "... server.s"
-	@echo "... tests/test_application.o"
-	@echo "... tests/test_application.i"
-	@echo "... tests/test_application.s"
 .PHONY : help
 
 

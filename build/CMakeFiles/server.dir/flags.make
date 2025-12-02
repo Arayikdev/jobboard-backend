@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/usr/local/include/mongocxx/v_noabi -I/usr/local/include/bsoncxx/v_noabi -I/home/arayik/thread/c++/backend/.
+CXX_INCLUDES = -I/home/arayik/thread/c++/backend/. -I/home/arayik/thread/c++/backend/./config -I/home/arayik/thread/c++/backend/./models -I/home/arayik/thread/c++/backend/./routes -I/home/arayik/thread/c++/backend/./services -I/home/arayik/thread/c++/backend/./utils -I/home/arayik/thread/c++/backend/./controllers
 
-CXX_FLAGS = -std=gnu++17
+CXX_FLAGS = -std=gnu++20
 

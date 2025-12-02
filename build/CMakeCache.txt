@@ -14,6 +14,11 @@
 # EXTERNAL cache entries
 ########################
 
+//The default library type that is used when linking against 'bson::bson'
+// (either SHARED or STATIC, requires that the package was built
+// with the appropriate library type)
+BSON_DEFAULT_IMPORTED_LIBRARY_TYPE:STRING=STATIC
+
 //Path to a program.
 CMAKE_ADDR2LINE:FILEPATH=/usr/bin/addr2line
 
@@ -224,6 +229,11 @@ JuniorJobBoardBackend_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 JuniorJobBoardBackend_SOURCE_DIR:STATIC=/home/arayik/thread/c++/backend
 
+//The default library type that is used when linking against 'mongoc::mongoc'
+// (either SHARED or STATIC, requires that the package was built
+// with the appropriate library type)
+MONGOC_DEFAULT_IMPORTED_LIBRARY_TYPE:STRING=STATIC
+
 //Path to a library.
 OPENSSL_CRYPTO_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libcrypto.so
 
@@ -238,6 +248,24 @@ PKG_CONFIG_ARGN:STRING=
 
 //pkg-config executable
 PKG_CONFIG_EXECUTABLE:FILEPATH=/usr/bin/pkg-config
+
+//Header include-directory for Cyrus libsasl2
+SASL2_INCLUDE_DIR:PATH=/usr/include
+
+//Library file for Cyrus libsasl2
+SASL2_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libsasl2.so
+
+//The directory containing a CMake configuration file for bson.
+bson_DIR:PATH=/usr/local/lib/cmake/bson-2.1.2
+
+//The directory containing a CMake configuration file for bsoncxx.
+bsoncxx_DIR:PATH=/usr/local/lib/cmake/bsoncxx-4.1.4
+
+//The directory containing a CMake configuration file for mongoc.
+mongoc_DIR:PATH=/usr/local/lib/cmake/mongoc-2.1.2
+
+//The directory containing a CMake configuration file for mongocxx.
+mongocxx_DIR:PATH=/usr/local/lib/cmake/mongocxx-4.1.4
 
 //Path to a library.
 pkgcfg_lib_BSONCXX_bsoncxx:FILEPATH=/usr/local/lib/libbsoncxx.so
@@ -294,6 +322,8 @@ BSONCXX_libbsoncxx_INCLUDEDIR:INTERNAL=
 BSONCXX_libbsoncxx_LIBDIR:INTERNAL=
 BSONCXX_libbsoncxx_PREFIX:INTERNAL=
 BSONCXX_libbsoncxx_VERSION:INTERNAL=
+//STRINGS property for variable: BSON_DEFAULT_IMPORTED_LIBRARY_TYPE
+BSON_DEFAULT_IMPORTED_LIBRARY_TYPE-STRINGS:INTERNAL=SHARED;STATIC
 //ADVANCED property for variable: CMAKE_ADDR2LINE
 CMAKE_ADDR2LINE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_AR
@@ -445,6 +475,8 @@ CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 FIND_PACKAGE_MESSAGE_DETAILS_OpenSSL:INTERNAL=[/usr/lib/x86_64-linux-gnu/libcrypto.so][/usr/include][c ][v3.0.13()]
 //Details about finding PkgConfig
 FIND_PACKAGE_MESSAGE_DETAILS_PkgConfig:INTERNAL=[/usr/bin/pkg-config][v1.8.1()]
+//Details about finding SASL2
+FIND_PACKAGE_MESSAGE_DETAILS_SASL2:INTERNAL=[2.1.28][/usr/include][/usr/lib/x86_64-linux-gnu/libsasl2.so][v2.1.28(2.0)]
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 MONGOCXX_CFLAGS:INTERNAL=-I/usr/local/include/mongocxx/v_noabi;-I/usr/local/include;-I/usr/local/include/bsoncxx/v_noabi
@@ -482,6 +514,8 @@ MONGOCXX_libmongocxx_INCLUDEDIR:INTERNAL=
 MONGOCXX_libmongocxx_LIBDIR:INTERNAL=
 MONGOCXX_libmongocxx_PREFIX:INTERNAL=
 MONGOCXX_libmongocxx_VERSION:INTERNAL=
+//STRINGS property for variable: MONGOC_DEFAULT_IMPORTED_LIBRARY_TYPE
+MONGOC_DEFAULT_IMPORTED_LIBRARY_TYPE-STRINGS:INTERNAL=SHARED;STATIC
 //ADVANCED property for variable: OPENSSL_CRYPTO_LIBRARY
 OPENSSL_CRYPTO_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: OPENSSL_INCLUDE_DIR

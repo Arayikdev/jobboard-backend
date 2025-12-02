@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/server.dir/server.cpp.o -o server  -lmongocxx -lbsoncxx -lbsoncxx /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so 
+/usr/bin/c++ CMakeFiles/server.dir/server.cpp.o -o server  -lbsoncxx::bsoncxx_shared -lmongocxx::mongocxx_shared /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libcrypto.so 
