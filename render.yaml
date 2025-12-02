@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: cpp-backend
-    env: native
-    buildCommand: |
-      g++ -O2 -std=c++20 -pthread -o server ./backend/server.cpp
-    startCommand: ./server
-    plan: free
