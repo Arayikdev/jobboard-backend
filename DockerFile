@@ -1,48 +1,41 @@
-# ========== Stage 1: Build ==========
-FROM ubuntu:22.04 AS builder
+FROM ubuntu:22.04 as builder
 
-# Install required tools
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && apt-get install -y \
-    g++ \
-    cmake \
-    make \
-    git \
-    pkg-config \
-    libssl-dev \
-    libsasl2-dev \
-    libcurl4-openssl-dev \
-    ca-certificates \
-    wget
-
-# Install MongoDB C++ driver (mongocxx)
-RUN apt-get update && apt-get install -y libmongocxx-dev libbsoncxx-dev
-
-# Set working directory
-WORKDIR /app
-
-# Copy project files
-COPY . .
-
-# Build project
-RUN mkdir build && cd build && cmake .. && make -j$(nproc)
-
-# ========== Stage 2: Runtime ==========
-FROM ubuntu:22.04
-
-# Install dependencies required for runtime
-RUN apt-get update && apt-get install -y \
-    libssl-dev \
-    libsasl2-dev \
-    libcurl4-openssl-dev \
-    libmongocxx-dev \
-    libbsoncxx-dev \
+    g++ cmake make git wget \
+    pkg-config libc6-dev libssl-dev libsasl2-dev libcurl4-openssl-dev \
+    python3 python3-pip \
     ca-certificates
 
-WORKDIR /app
+# Install MongoDB C++ Driver (bsoncxx + mongocxx)
+WORKDIR /tmp
 
-# Copy binaries from builder
+RUN wget https://github.com/mongodb/mongo-cxx-driver/releases/download/r3.8.0/mongo-cxx-driver-r3.8.0.tar.gz
+RUN tar -xzf mongo-cxx-driver-r3.8.0.tar.gz
+WORKDIR /tmp/mongo-cxx-driver-r3.8.0/build
+
+RUN cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+RUN cmake --build . --target install
+
+# BUILD YOUR APP
+WORKDIR /app
+COPY . .
+
+RUN mkdir build && cd build && cmake .. && make -j$(nproc)
+
+FROM ubuntu:22.04
+
+RUN apt-get update && apt-get install -y \
+    libssl-dev libsasl2-dev libcurl4-openssl-dev ca-certificates
+
+COPY --from=builder /usr/local/lib /usr/local/lib
+COPY --from=builder /usr/local/include /usr/local/include
+
+WORKDIR /app
 COPY --from=builder /app/build/server /app/server
 
-EXPOSE 8080
+RUN ldconfig
 
+EXPOSE 8080
 CMD ["./server"]
