@@ -1,38 +1,33 @@
 FROM ubuntu:22.04
 
-# ===== 1. Install system deps =====
+# 1. Install base dependencies
 RUN apt-get update && apt-get install -y \
     g++ cmake make pkg-config wget curl git \
-    libssl-dev libsasl2-dev libicu-dev \
-    libbson-dev libmongoc-dev && \
+    libssl-dev libsasl2-dev libicu-dev gnupg && \
     apt-get clean
 
+# 2. Add MongoDB repo for C and C++ drivers
+RUN wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | gpg --dearmor > /usr/share/keyrings/mongodb.gpg
+RUN echo "deb [ arch=amd64 signed-by=/usr/share/keyrings/mongodb.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" \
+    > /etc/apt/sources.list.d/mongodb-org-6.0.list
 
-# ===== 2. Install MongoDB C++ Driver (mongocxx/bsoncxx) =====
-RUN wget https://github.com/mongodb/mongo-cxx-driver/archive/r3.9.0.tar.gz && \
-    tar -xzf r3.9.0.tar.gz && \
-    cd mongo-cxx-driver-r3.9.0/build && \
-    cmake .. -DCMAKE_BUILD_TYPE=Release -DBSONCXX_POLY_USE_MNMLSTC=1 && \
-    cmake --build . --target install && \
-    ldconfig
+# 3. Install official MongoDB C++ driver (bsoncxx + mongocxx)
+RUN apt-get update && apt-get install -y \
+    libmongocxx-dev \
+    libbsoncxx-dev
 
-
-# ===== 3. Copy your project =====
+# 4. Copy project
 WORKDIR /app
 COPY . .
 
-
-# ===== 4. Build your server with your EXACT command =====
-RUN g++ -std=c++20 \
-    /app/backend/server.cpp \
+# 5. Build project using your command
+RUN g++ -std=c++20 /app/backend/server.cpp \
     -o server \
     $(pkg-config --cflags --libs libmongocxx) \
     -lcrypto -lssl -pthread
 
-
-# ===== 5. Expose port =====
+# 6. Expose port
 EXPOSE 8080
 
-
-# ===== 6. Run server =====
+# 7. Start server
 CMD ["./server"]
