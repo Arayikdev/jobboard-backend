@@ -3,11 +3,27 @@ builder = "railway.cpp"
 
 [build.packages]
 apt = [
-    "libmongocxx-dev",
-    "libbsoncxx-dev",
-    "libsasl2-dev",
     "libssl-dev",
+    "libsasl2-dev",
     "libcurl4-openssl-dev",
+    "cmake",
+    "make",
+    "g++",
+    "git"
+]
+
+[build.steps]
+commands = [
+    # 1. Скачать mongo-c-driver
+    "git clone https://github.com/mongodb/mongo-c-driver.git --branch 1.26.0",
+    "cd mongo-c-driver && mkdir cmake-build && cd cmake-build && cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF .. && make -j$(nproc) && make install",
+
+    # 2. Скачать mongo-cxx-driver
+    "git clone https://github.com/mongodb/mongo-cxx-driver.git --branch r3.10.1",
+    "cd mongo-cxx-driver/build && cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local && make -j$(nproc) && make install",
+
+    # 3. Собрать твой проект
+    "mkdir build && cd build && cmake .. && make -j$(nproc)"
 ]
 
 [deploy]
