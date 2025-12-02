@@ -45,7 +45,7 @@ void registerApplicationRoutes(httplib::Server &server,
                        return;
                    }
 
-                   controller.getUserApplications(req, res);
+                   controller.getUserApplications(pathId, req, res);
                });
 
     // ============================================================

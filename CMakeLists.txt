@@ -1,40 +1,46 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 project(JuniorJobBoardBackend)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Find dependencies
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(MONGOCXX REQUIRED libmongocxx)
-pkg_check_modules(BSONCXX REQUIRED libbsoncxx)
-
+# Dependencies installed from APT inside Docker
+find_package(mongocxx REQUIRED)
+find_package(bsoncxx REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(Threads REQUIRED)
 
 # Include directories
 include_directories(
-    ${MONGOCXX_INCLUDE_DIRS}
-    ${BSONCXX_INCLUDE_DIRS}
     ${OPENSSL_INCLUDE_DIR}
     .
+    ./config
+    ./models
+    ./routes
+    ./services
+    ./utils
+    ./controllers
 )
 
-# Server executable
-add_executable(server server.cpp)
+# Gather all .cpp files
+file(GLOB_RECURSE SOURCES
+    server.cpp
+    config/*.cpp
+    models/*.cpp
+    routes/*.cpp
+    services/*.cpp
+    utils/*.cpp
+    controllers/*.cpp
+)
 
-# Link libraries
+# Create executable
+add_executable(server ${SOURCES})
+
+# Link libs
 target_link_libraries(server
-    ${MONGOCXX_LIBRARIES}
-    ${BSONCXX_LIBRARIES}
+    bsoncxx::bsoncxx_shared
+    mongocxx::mongocxx_shared
     OpenSSL::SSL
     OpenSSL::Crypto
     Threads::Threads
-)
-
-# Test executable
-add_executable(test_application tests/test_application.cpp)
-target_link_libraries(test_application
-    ${MONGOCXX_LIBRARIES}
-    ${BSONCXX_LIBRARIES}
 )

@@ -6,10 +6,12 @@
 #include "routes/CompanyRoutes.hpp"
 #include "routes/JobRoutes.hpp"
 #include "routes/UserRoutes.hpp"
+#include "third_party/httplib.h"
 #include "utils/jwt.hpp"
 
 int main() {
   // Initializing Database
+  Env::load();
   Database database;
   auto db = database.getDb();
 
@@ -50,7 +52,7 @@ int main() {
 
   ApplicationController applicationController(applicationservice, jobservice);
 
-  AdminService adminservice(jobCollection);
+  AdminService adminservice(jobCollection, applicationCollection);
   AdminController admincontroller(adminservice);
 
   registerApplicationRoutes(server, applicationController);

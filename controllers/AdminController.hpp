@@ -7,7 +7,6 @@
 
 using json = nlohmann::json;
 
-
 class AdminController
 {
 private:
@@ -32,7 +31,52 @@ public:
         }
     }
 
+    void getPendingApplications(httplib::Response &res)
+    {
+        try
+        {
+            auto jobs = service.getPendingApplications();
+            res.status = 200;
+            res.set_content(json(jobs).dump(), "application/json");
+        }
+        catch (const std::exception &e)
+        {
+            res.status = 500;
+            res.set_content("Failed to fetch pending applications", "text/plain");
+        }
+    }
+
     // PATCH /admin/jobs/:id/approve
+    void approveApplication(const std::string &id, httplib::Response &res)
+    {
+        bool ok = service.approveApplication(id);
+
+        if (ok)
+        {
+            res.status = 200;
+            res.set_content("Application approved", "text/plain");
+        }
+        else
+        {
+            res.status = 400;
+            res.set_content("Failed to approve application", "text/plain");
+        }
+    }
+    void rejectApplication(const std::string &id, httplib::Response &res)
+    {
+        bool ok = service.rejectApplication(id);
+
+        if (ok)
+        {
+            res.status = 200;
+            res.set_content("Application rejected", "text/plain");
+        }
+        else
+        {
+            res.status = 400;
+            res.set_content("Failed to reject application", "text/plain");
+        }
+    }
     void approveJob(const std::string &id, httplib::Response &res)
     {
         bool ok = service.approveJob(id);

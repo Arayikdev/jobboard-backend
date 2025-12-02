@@ -6,11 +6,9 @@
 #include <mongocxx/collection.hpp>
 #include <vector>
 
-using namespace bsoncxx::builder::basic;
-using json = nlohmann::json;
+// Removed global using namespace to prevent pollution
 
-class UserService
-{
+class UserService {
 private:
   mongocxx::collection collection;
 
@@ -18,22 +16,21 @@ public:
   UserService(mongocxx::collection coll) : collection(coll) {}
 
   // GET /users → only public users
-  std::vector<json> getUsers(const httplib::Request &req)
-  {
+  std::vector<nlohmann::json> getUsers(const httplib::Request &req) {
+    using namespace bsoncxx::builder::basic;
+    using json = nlohmann::json;
     bsoncxx::builder::basic::document filter{};
     filter.append(kvp("isPublic", true)); // only public users
 
     // ---------------- CATEGORY (string) ----------------
-    if (req.has_param("category"))
-    {
+    if (req.has_param("category")) {
       std::string category = req.get_param_value("category");
       if (!category.empty())
         filter.append(kvp("category", category));
     }
 
     // ---------------- SKILLS (vector<string>) ----------------
-    if (req.has_param("skills"))
-    {
+    if (req.has_param("skills")) {
       std::string skillsStr = req.get_param_value("skills"); // "JS,Python"
       std::stringstream ss(skillsStr);
       std::string item;
@@ -47,8 +44,7 @@ public:
     }
 
     // ---------------- PROGRAMMING LANGUAGES (vector<string>) ----------------
-    if (req.has_param("programming_languages"))
-    {
+    if (req.has_param("programming_languages")) {
       std::string langsStr =
           req.get_param_value("programming_languages"); // "C++,Python"
       std::stringstream ss(langsStr);
@@ -64,18 +60,16 @@ public:
     }
 
     // ---------------- GRADE (string) ----------------
-    if (req.has_param("grade"))
-    {
+    if (req.has_param("grade")) {
       std::string grade = req.get_param_value("grade");
       if (!grade.empty())
         filter.append(kvp("grade", grade));
     }
 
     // ---------------- Query Mongo ----------------
-    std::vector<json> users;
+    std::vector<nlohmann::json> users;
 
-    for (auto &&doc : collection.find(filter.view()))
-    {
+    for (auto &&doc : collection.find(filter.view())) {
       auto obj = json::parse(bsoncxx::to_json(doc));
       obj.erase("password"); // hide password
       users.push_back(obj);
@@ -85,8 +79,9 @@ public:
   }
 
   // PUBLIC PROFILE
-  json getOnePublic(const bsoncxx::oid &user_oid)
-  {
+  nlohmann::json getOnePublic(const bsoncxx::oid &user_oid) {
+    using namespace bsoncxx::builder::basic;
+    using json = nlohmann::json;
     auto result = collection.find_one(
         make_document(kvp("_id", user_oid), kvp("isPublic", true)));
 
@@ -97,8 +92,9 @@ public:
   }
 
   // PRIVATE PROFILE (OWNER)
-  json getOnePrivate(const bsoncxx::oid &user_oid)
-  {
+  nlohmann::json getOnePrivate(const bsoncxx::oid &user_oid) {
+    using namespace bsoncxx::builder::basic;
+    using json = nlohmann::json;
     auto result = collection.find_one(make_document(kvp("_id", user_oid)));
 
     if (!result)
@@ -108,22 +104,19 @@ public:
   }
 
   // UPDATE PROFILE (OWNER ONLY)
-  bool updateProfile(const std::string &id, const json &body)
-  {
+  bool updateProfile(const std::string &id, const nlohmann::json &body) {
+    using namespace bsoncxx::builder::basic;
+    using json = nlohmann::json;
     bsoncxx::oid user_oid;
-    try
-    {
+    try {
       user_oid = bsoncxx::oid{id};
-    }
-    catch (...)
-    {
+    } catch (...) {
       return false;
     }
 
     bsoncxx::builder::basic::document setDoc{};
 
-    for (auto it = body.begin(); it != body.end(); ++it)
-    {
+    for (auto it = body.begin(); it != body.end(); ++it) {
       const auto &key = it.key();
       if (key == "_id" || key == "createdAt")
         continue;
@@ -145,8 +138,10 @@ public:
 
   // JSON → BSON helper
   static void append_json_value(bsoncxx::builder::basic::document &doc,
-                                const std::string &key, const json &value)
-  {
+                                const std::string &key,
+                                const nlohmann::json &value) {
+    using namespace bsoncxx::builder::basic;
+    using json = nlohmann::json;
     using bsoncxx::builder::basic::sub_array;
 
     if (value.is_null())
@@ -161,10 +156,8 @@ public:
       doc.append(kvp(key, value.get<double>()));
     else if (value.is_string())
       doc.append(kvp(key, value.get<std::string>()));
-    else if (value.is_array())
-    {
-      doc.append(kvp(key, [&](sub_array arr)
-                     {
+    else if (value.is_array()) {
+      doc.append(kvp(key, [&](sub_array arr) {
         for (const auto &el : value) {
           if (el.is_null())
             arr.append(bsoncxx::types::b_null{});
@@ -180,9 +173,9 @@ public:
             arr.append(el.get<std::string>());
           else
             arr.append(el.dump());
-        } }));
-    }
-    else
+        }
+      }));
+    } else
       doc.append(kvp(key, value.dump()));
   }
 };

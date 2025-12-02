@@ -1,0 +1,2 @@
+username=hakobjanyanarayik2003_db_user
+password=M5HU4oYN19dr28Ww
